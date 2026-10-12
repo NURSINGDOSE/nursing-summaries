@@ -211,7 +211,7 @@ async function openReader(it){
   if(!window.pdfjsLib){ st.textContent="مقدرناش نعرض الملف هنا. دوس «فتح» فوق."; return; }
   try{
     if(task) task.destroy();
-    task=pdfjsLib.getDocument({url:it.file});
+    const PJ="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; task=pdfjsLib.getDocument({url:it.file,disableFontFace:true,cMapUrl:PJ+"cmaps/",cMapPacked:true,standardFontDataUrl:PJ+"standard_fonts/"});
     const pdf=await task.promise;
     if(openItem!==it) return;
     st.remove();
