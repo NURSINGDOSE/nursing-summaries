@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="ملخصات الدفعة مترتبة حسب كل مادة">
+<meta property="og:title" content="مكتبة ملخصات الدفعة">
+<meta property="og:description" content="كل الملخصات مترتبة حسب المادة. افتح واقرأ أو حمّل على طول.">
+<title>مكتبة ملخصات الدفعة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}
+/* Layout: sticky header with search + subject shelf tabs, then a grid of summary "charts" (cover thumbnails), and a full-screen reader. */
+:root{
+  --paper:#f3f6f5; --sheet:#ffffff; --ink:#132b27; --muted:#5b6f6b; --line:#d7e1de;
+  --accent:#17705f; --accent-ink:#ffffff; --tint:#e3efeb; --mark:#f0c45a;
+  --shadow:0 1px 2px rgba(19,43,39,.06),0 6px 20px rgba(19,43,39,.07);
+  --display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f1817; --sheet:#16211f; --ink:#e3ece9; --muted:#9db0ab; --line:#28403b;
+  --accent:#4fbfa6; --accent-ink:#06201b; --tint:#1b2e2a; --mark:#e2b74f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1817; --sheet:#16211f; --ink:#e3ece9; --muted:#9db0ab; --line:#28403b;
+  --accent:#4fbfa6; --accent-ink:#06201b; --tint:#1b2e2a; --mark:#e2b74f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;direction:rtl}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px;padding-block:22px 14px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,4vw,2.1rem);margin:0;line-height:1.2;text-wrap:balance}
+h1 .hl{background:linear-gradient(transparent 62%,var(--mark) 62%,var(--mark) 90%,transparent 90%);padding-inline:2px}
+.sub{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.search{flex:1 1 240px;max-width:340px;position:relative}
+.search input{width:100%;font:inherit;font-size:.95rem;padding:10px 40px 10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--sheet);color:var(--ink)}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.search svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-block:0 14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font:inherit;font-family:var(--display);font-size:.92rem;font-weight:600;display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
+.tab .n{font-family:var(--body);font-weight:500;font-size:.78rem;min-width:22px;text-align:center;padding:0 6px;border-radius:999px;background:var(--tint);color:var(--muted);font-variant-numeric:tabular-nums}
+.tab.soon{color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tab[aria-selected="true"] .n{background:rgba(255,255,255,.22);color:inherit}
+.tab:focus-visible,.card:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-block:22px 48px;display:grid;gap:34px}
+section h2{font-family:var(--display);font-size:1.2rem;margin:0 0 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+section h2 small{font-family:var(--body);font-weight:400;font-size:.85rem;color:var(--muted)}
+.copy{font:inherit;font-size:.8rem;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+.grid{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;text-align:start;font:inherit;color:inherit;background:var(--sheet);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;padding:0;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.thumb{aspect-ratio:3/4;max-width:100%;background:#fff;border-bottom:1px solid var(--line);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.meta{padding:10px 12px 12px;display:grid;gap:2px;min-width:0}
+.meta b{direction:ltr;text-align:left;font-family:var(--display);font-weight:600;font-size:.95rem;line-height:1.35}
+.meta span{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.empty{margin-top:12px;padding:22px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center}
+.none{color:var(--muted);text-align:center;padding:40px 0}
+
+/* reader */
+.reader{position:fixed;inset:0;z-index:20;background:var(--paper);display:flex;flex-direction:column}
+.rbar{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;border-bottom:1px solid var(--line);background:var(--sheet)}
+.rbar .t{flex:1;min-width:0;font-family:var(--display);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}
+.btn{font:inherit;font-size:.88rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pages{flex:1;overflow:auto;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 24px);display:flex;flex-direction:column;align-items:center;gap:14px}
+.page{width:100%;max-width:820px;background:#fff;box-shadow:var(--shadow);border-radius:4px;position:relative}
+.page canvas{width:100%;height:auto;display:block;border-radius:4px}
+.status{color:var(--muted);padding:30px;text-align:center}
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;font-size:.88rem;z-index:30}
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.head{padding-block:16px 10px}.btn .lbl{display:none}}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <h1>مكتبة <span class="hl">ملخصات</span> الدفعة</h1>
+        <p class="sub" id="summary"></p>
+      </div>
+      <label class="search" for="q">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="دوّر على ملخص… مثلاً Piaget" autocomplete="off">
+      </label>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="المواد"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="list"></main>
+
+<div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="rtitle">
+  <div class="rbar">
+    <button class="btn" id="close" type="button" aria-label="رجوع">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg><span class="lbl">رجوع</span></button>
+    <div class="t" id="rtitle"></div>
+    <a class="btn" id="open" target="_blank" rel="noopener"><span>فتح</span></a>
+    <a class="btn primary" id="dl" download>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg><span class="lbl">تحميل</span></a>
+  </div>
+  <div class="pages" id="pages"></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+const DATA = [{"name": "اطفال نظري", "slug": "peds-theory", "items": [{"title": "Accident Prevention", "file": "files/peds-theory-1.pdf", "orig": "Accident prevention Sum.pdf", "pages": 9, "size": 1718729, "thumb": "thumbs/peds-theory-1.jpg"}, {"title": "Breast Feeding", "file": "files/peds-theory-2.pdf", "orig": "Breast Feeding Sum.pdf", "pages": 13, "size": 2045009, "thumb": "thumbs/peds-theory-2.jpg"}, {"title": "Ethical Principles & Legal Issues", "file": "files/peds-theory-3.pdf", "orig": "Ethical Principles, Legal Issues (1).pdf", "pages": 14, "size": 2195080, "thumb": "thumbs/peds-theory-3.jpg"}, {"title": "GIT Anomalies", "file": "files/peds-theory-4.pdf", "orig": "GIT_Aomalies Sum 4.pdf", "pages": 9, "size": 1545446, "thumb": "thumbs/peds-theory-4.jpg"}, {"title": "Hospitalization", "file": "files/peds-theory-5.pdf", "orig": "Hospitalization Sum (2).pdf", "pages": 8, "size": 2083301, "thumb": "thumbs/peds-theory-5.jpg"}, {"title": "Perspectives of Pediatric Nursing", "file": "files/peds-theory-6.pdf", "orig": "Perspectives of pediatric nursing SUM.pdf 2 (1).pdf", "pages": 14, "size": 3004029, "thumb": "thumbs/peds-theory-6.jpg"}, {"title": "High-Risk Neonate", "file": "files/peds-theory-7.pdf", "orig": "high risk neonate Sum.pdf", "pages": 11, "size": 1621767, "thumb": "thumbs/peds-theory-7.jpg"}, {"title": "Play", "file": "files/peds-theory-8.pdf", "orig": "play Sum (1).pdf", "pages": 9, "size": 1303895, "thumb": "thumbs/peds-theory-8.jpg"}]}, {"name": "اطفال عملي", "slug": "peds-lab", "items": []}, {"name": "طب اطفال", "slug": "peds-med", "items": [{"title": "Ethical Approach", "file": "files/peds-med-1.pdf", "orig": "Ethical approach Sum.pdf", "pages": 7, "size": 1744889, "thumb": "thumbs/peds-med-1.jpg"}, {"title": "Pediatric Medicolegal Dilemmas", "file": "files/peds-med-2.pdf", "orig": "Pediatric Medicolegal Dilemmas Sum.pdf", "pages": 8, "size": 1565434, "thumb": "thumbs/peds-med-2.jpg"}]}, {"name": "جراحه اطفال", "slug": "peds-surg", "items": [{"title": "CHPS & TOF", "file": "files/peds-surg-1.pdf", "orig": "CHPS TOF Sum.pdf", "pages": 6, "size": 1328207, "thumb": "thumbs/peds-surg-1.jpg"}, {"title": "OIH, Hydro & UDT Nursing", "file": "files/peds-surg-2.pdf", "orig": "OIH_Hydro_UDT_nursing Sum.pdf", "pages": 8, "size": 1715555, "thumb": "thumbs/peds-surg-2.jpg"}, {"title": "Pediatric Surgical Care", "file": "files/peds-surg-3.pdf", "orig": "Pediatric SURGICAL CARE.pdf", "pages": 9, "size": 2010144, "thumb": "thumbs/peds-surg-3.jpg"}]}, {"name": "نمو وتطور", "slug": "growth", "items": [{"title": "Concepts of Growth", "file": "files/growth-1.pdf", "orig": "Concepts of Growth (1).pdf", "pages": 9, "size": 8901711, "thumb": "thumbs/growth-1.jpg"}, {"title": "Erikson’s Psychosocial Theory", "file": "files/growth-2.pdf", "orig": "Erikson’s Psychosocial Theory Sum.pdf", "pages": 7, "size": 1366810, "thumb": "thumbs/growth-2.jpg"}, {"title": "Freud’s Psychosexual Theory", "file": "files/growth-3.pdf", "orig": "Freud’s Psychosexual Theory Sum.pdf", "pages": 6, "size": 1326225, "thumb": "thumbs/growth-3.jpg"}, {"title": "Kohlberg’s Moral Development", "file": "files/growth-4.pdf", "orig": "Kohlberg’s Moral Development Sum.pdf", "pages": 6, "size": 1363455, "thumb": "thumbs/growth-4.jpg"}, {"title": "Piaget’s Cognitive Theory", "file": "files/growth-5.pdf", "orig": "Piaget’s Cognitive Theory Sum.pdf", "pages": 7, "size": 1613418, "thumb": "thumbs/growth-5.jpg"}]}, {"name": "قضايا", "slug": "issues", "items": [{"title": "Problems Arising from Population Growth", "file": "files/issues-1.pdf", "orig": "Problems Arising from Population Growth Sum.pdf", "pages": 8, "size": 1539229, "thumb": "thumbs/issues-1.jpg"}]}, {"name": "استراتيجيات", "slug": "strategies", "items": []}, {"name": "انجيلزي 3", "slug": "english3", "items": []}];
+const NAMES = {"اطفال نظري":"أطفال نظري","اطفال عملي":"أطفال عملي","طب اطفال":"طب أطفال","جراحه اطفال":"جراحة أطفال","نمو وتطور":"نمو وتطور","قضايا":"قضايا","استراتيجيات":"استراتيجيات","انجيلزي 3":"إنجليزي 3"};
+const ar = n => n.toLocaleString("ar-EG");
+const pagesWord = n => n===1?"صفحة واحدة":n===2?"صفحتين":(n<=10?ar(n)+" صفحات":ar(n)+" صفحة");
+const mb = b => (b/1048576).toLocaleString("ar-EG",{maximumFractionDigits:1})+" م.ب";
+const $ = id => document.getElementById(id);
+
+const total = DATA.reduce((a,s)=>a+s.items.length,0);
+const ready = DATA.filter(s=>s.items.length).length;
+$("summary").textContent = `${ar(total)} ملخص في ${ar(ready)} مواد · اختار المادة وافتح الملخص على طول`;
+
+let current = "all";
+function readHash(){ const h=location.hash.slice(1); return DATA.some(s=>s.slug===h)?h:"all"; }
+
+function renderTabs(){
+  const t=$("tabs"); t.textContent="";
+  const mk=(slug,label,n,soon)=>{
+    const b=document.createElement("button");
+    b.className="tab"+(soon?" soon":""); b.type="button"; b.role="tab"; b.id="tab-"+slug;
+    b.setAttribute("aria-selected",String(current===slug));
+    const s1=document.createElement("span"); s1.textContent=label; b.append(s1);
+    const s2=document.createElement("span"); s2.className="n"; s2.textContent=soon?"قريباً":ar(n); b.append(s2);
+    b.onclick=()=>{current=slug; try{history.replaceState(null,"",slug==="all"?location.pathname:"#"+slug);}catch(e){} renderTabs(); render(); window.scrollTo({top:0});};
+    t.append(b);
+  };
+  mk("all","كل المواد",total,false);
+  DATA.forEach(s=>mk(s.slug,NAMES[s.name]||s.name,s.items.length,!s.items.length));
+  const sel=t.querySelector('[aria-selected="true"]'); sel&&sel.scrollIntoView({block:"nearest",inline:"center"});
+}
+
+function render(){
+  const q=$("q").value.trim().toLowerCase();
+  const list=$("list"); list.textContent="";
+  let shown=0;
+  DATA.forEach(s=>{
+    if(current!=="all"&&s.slug!==current) return;
+    const items=s.items.filter(it=>!q||it.title.toLowerCase().includes(q)||it.orig.toLowerCase().includes(q));
+    if(q&&!items.length) return;
+    if(current==="all"&&!s.items.length) return;
+    const sec=document.createElement("section");
+    const h=document.createElement("h2"); h.textContent=NAMES[s.name]||s.name;
+    const sm=document.createElement("small"); sm.textContent=s.items.length?`${ar(s.items.length)} ملخص`:"";
+    h.append(sm);
+    sec.append(h);
+    if(!s.items.length){
+      const e=document.createElement("div"); e.className="empty"; e.textContent="لسه مفيش ملخصات للمادة دي. أول ما تنزل هتلاقيها هنا.";
+      sec.append(e);
+    } else {
+      const g=document.createElement("div"); g.className="grid";
+      items.forEach(it=>{
+        shown++;
+        const card=document.createElement("button"); card.className="card"; card.type="button";
+        const th=document.createElement("div"); th.className="thumb";
+        const img=document.createElement("img"); img.src=it.thumb; img.alt=""; img.loading="lazy"; th.append(img);
+        const m=document.createElement("div"); m.className="meta";
+        const b=document.createElement("b"); b.textContent=it.title;
+        const sp=document.createElement("span"); sp.textContent=`${it.pages?pagesWord(it.pages)+" · ":""}${mb(it.size)}`;
+        m.append(b,sp); card.append(th,m);
+        card.onclick=()=>openReader(it);
+        g.append(card);
+      });
+      sec.append(g);
+    }
+    list.append(sec);
+  });
+  if(!list.children.length){
+    const n=document.createElement("p"); n.className="none"; n.textContent=q?`مفيش ملخص اسمه "${$("q").value}". جرّب كلمة تانية.`:"";
+    list.append(n);
+  }
+}
+
+function toast(msg){const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2400);}
+
+/* ---------- reader ---------- */
+let task=null, observer=null, openItem=null;
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+async function openReader(it){
+  openItem=it;
+  $("rtitle").textContent=it.title; $("open").href=it.file; $("dl").href=it.file; $("dl").setAttribute("download",it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf");
+  $("reader").hidden=false; document.body.style.overflow="hidden";
+  const box=$("pages"); box.textContent=""; box.scrollTop=0;
+  const st=document.createElement("div"); st.className="status"; st.textContent="بيفتح الملخص…"; box.append(st);
+  $("close").focus();
+  if(!window.pdfjsLib){ st.textContent="مقدرناش نعرض الملف هنا. دوس «فتح» فوق."; return; }
+  try{
+    if(task) task.destroy();
+    task=pdfjsLib.getDocument({url:it.file});
+    const pdf=await task.promise;
+    if(openItem!==it) return;
+    st.remove();
+    observer&&observer.disconnect();
+    observer=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ observer.unobserve(e.target); drawPage(pdf,+e.target.dataset.n,e.target);} }),{root:box,rootMargin:"600px 0px"});
+    const first=await pdf.getPage(1); const vp=first.getViewport({scale:1});
+    for(let i=1;i<=pdf.numPages;i++){
+      const d=document.createElement("div"); d.className="page"; d.dataset.n=i;
+      d.style.aspectRatio=`${vp.width} / ${vp.height}`;
+      box.append(d); observer.observe(d);
+    }
+  }catch(e){ if(openItem===it) st.textContent="حصلت مشكلة وإحنا بنفتح الملف. دوس «فتح» فوق."; }
+}
+async function drawPage(pdf,n,holder){
+  const page=await pdf.getPage(n);
+  const w=holder.clientWidth||800, dpr=Math.min(window.devicePixelRatio||1,2.5);
+  const vp=page.getViewport({scale:(w*dpr)/page.getViewport({scale:1}).width});
+  const c=document.createElement("canvas"); c.width=vp.width; c.height=vp.height;
+  holder.style.aspectRatio=""; holder.append(c);
+  await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
+}
+function closeReader(){ $("reader").hidden=true; document.body.style.overflow=""; openItem=null; if(task){task.destroy();task=null;} observer&&observer.disconnect(); $("pages").textContent=""; }
+$("close").onclick=closeReader;
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("reader").hidden) closeReader(); });
+
+
+$("q").addEventListener("input",render);
+window.addEventListener("hashchange",()=>{current=readHash(); renderTabs(); render();});
+current=readHash(); renderTabs(); render();
+</script>
+
+</body>
+</html>
