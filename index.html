@@ -126,6 +126,7 @@ section h2 small{font-family:var(--body);font-weight:400;font-size:.85rem;color:
 <script>
 const DATA = [{"name": "اطفال نظري", "slug": "peds-theory", "items": [{"title": "Accident Prevention", "file": "files/peds-theory-1.pdf", "orig": "Accident prevention Sum.pdf", "pages": 9, "size": 1718729, "thumb": "thumbs/peds-theory-1.jpg"}, {"title": "Breast Feeding", "file": "files/peds-theory-2.pdf", "orig": "Breast Feeding Sum.pdf", "pages": 13, "size": 2045009, "thumb": "thumbs/peds-theory-2.jpg"}, {"title": "Ethical Principles & Legal Issues", "file": "files/peds-theory-3.pdf", "orig": "Ethical Principles, Legal Issues (1).pdf", "pages": 14, "size": 2195080, "thumb": "thumbs/peds-theory-3.jpg"}, {"title": "GIT Anomalies", "file": "files/peds-theory-4.pdf", "orig": "GIT_Aomalies Sum 4.pdf", "pages": 9, "size": 1545446, "thumb": "thumbs/peds-theory-4.jpg"}, {"title": "Hospitalization", "file": "files/peds-theory-5.pdf", "orig": "Hospitalization Sum (2).pdf", "pages": 8, "size": 2083301, "thumb": "thumbs/peds-theory-5.jpg"}, {"title": "Perspectives of Pediatric Nursing", "file": "files/peds-theory-6.pdf", "orig": "Perspectives of pediatric nursing SUM.pdf 2 (1).pdf", "pages": 14, "size": 3004029, "thumb": "thumbs/peds-theory-6.jpg"}, {"title": "High-Risk Neonate", "file": "files/peds-theory-7.pdf", "orig": "high risk neonate Sum.pdf", "pages": 11, "size": 1621767, "thumb": "thumbs/peds-theory-7.jpg"}, {"title": "Play", "file": "files/peds-theory-8.pdf", "orig": "play Sum (1).pdf", "pages": 9, "size": 1303895, "thumb": "thumbs/peds-theory-8.jpg"}]}, {"name": "اطفال عملي", "slug": "peds-lab", "items": []}, {"name": "طب اطفال", "slug": "peds-med", "items": [{"title": "Ethical Approach", "file": "files/peds-med-1.pdf", "orig": "Ethical approach Sum.pdf", "pages": 7, "size": 1744889, "thumb": "thumbs/peds-med-1.jpg"}, {"title": "Pediatric Medicolegal Dilemmas", "file": "files/peds-med-2.pdf", "orig": "Pediatric Medicolegal Dilemmas Sum.pdf", "pages": 8, "size": 1565434, "thumb": "thumbs/peds-med-2.jpg"}]}, {"name": "جراحه اطفال", "slug": "peds-surg", "items": [{"title": "CHPS & TOF", "file": "files/peds-surg-1.pdf", "orig": "CHPS TOF Sum.pdf", "pages": 6, "size": 1328207, "thumb": "thumbs/peds-surg-1.jpg"}, {"title": "OIH, Hydro & UDT Nursing", "file": "files/peds-surg-2.pdf", "orig": "OIH_Hydro_UDT_nursing Sum.pdf", "pages": 8, "size": 1715555, "thumb": "thumbs/peds-surg-2.jpg"}, {"title": "Pediatric Surgical Care", "file": "files/peds-surg-3.pdf", "orig": "Pediatric SURGICAL CARE.pdf", "pages": 9, "size": 2010144, "thumb": "thumbs/peds-surg-3.jpg"}]}, {"name": "نمو وتطور", "slug": "growth", "items": [{"title": "Concepts of Growth", "file": "files/growth-1.pdf", "orig": "Concepts of Growth (1).pdf", "pages": 9, "size": 8901711, "thumb": "thumbs/growth-1.jpg"}, {"title": "Erikson’s Psychosocial Theory", "file": "files/growth-2.pdf", "orig": "Erikson’s Psychosocial Theory Sum.pdf", "pages": 7, "size": 1366810, "thumb": "thumbs/growth-2.jpg"}, {"title": "Freud’s Psychosexual Theory", "file": "files/growth-3.pdf", "orig": "Freud’s Psychosexual Theory Sum.pdf", "pages": 6, "size": 1326225, "thumb": "thumbs/growth-3.jpg"}, {"title": "Kohlberg’s Moral Development", "file": "files/growth-4.pdf", "orig": "Kohlberg’s Moral Development Sum.pdf", "pages": 6, "size": 1363455, "thumb": "thumbs/growth-4.jpg"}, {"title": "Piaget’s Cognitive Theory", "file": "files/growth-5.pdf", "orig": "Piaget’s Cognitive Theory Sum.pdf", "pages": 7, "size": 1613418, "thumb": "thumbs/growth-5.jpg"}]}, {"name": "قضايا", "slug": "issues", "items": [{"title": "Problems Arising from Population Growth", "file": "files/issues-1.pdf", "orig": "Problems Arising from Population Growth Sum.pdf", "pages": 8, "size": 1539229, "thumb": "thumbs/issues-1.jpg"}]}, {"name": "استراتيجيات", "slug": "strategies", "items": []}, {"name": "انجيلزي 3", "slug": "english3", "items": []}];
 const NAMES = {"اطفال نظري":"أطفال نظري","اطفال عملي":"أطفال عملي","طب اطفال":"طب أطفال","جراحه اطفال":"جراحة أطفال","نمو وتطور":"نمو وتطور","قضايا":"قضايا","استراتيجيات":"استراتيجيات","انجيلزي 3":"إنجليزي 3"};
+const CDN = "https://cdn.jsdelivr.net/gh/NURSINGDOSE/nursing-summaries@main/";
 const ar = n => n.toLocaleString("ar-EG");
 const pagesWord = n => n===1?"صفحة واحدة":n===2?"صفحتين":(n<=10?ar(n)+" صفحات":ar(n)+" صفحة");
 const mb = b => (b/1048576).toLocaleString("ar-EG",{maximumFractionDigits:1})+" م.ب";
@@ -177,7 +178,7 @@ function render(){
         shown++;
         const card=document.createElement("button"); card.className="card"; card.type="button";
         const th=document.createElement("div"); th.className="thumb";
-        const img=document.createElement("img"); img.src=it.thumb; img.alt=""; img.loading="lazy"; th.append(img);
+        const img=document.createElement("img"); img.src=CDN+it.thumb; img.onerror=()=>{img.onerror=null; img.src=it.thumb;}; img.alt=""; img.loading="lazy"; th.append(img);
         const m=document.createElement("div"); m.className="meta";
         const b=document.createElement("b"); b.textContent=it.title;
         const sp=document.createElement("span"); sp.textContent=`${it.pages?pagesWord(it.pages)+" · ":""}${mb(it.size)}`;
@@ -199,11 +200,12 @@ function toast(msg){const t=$("toast"); t.textContent=msg; t.hidden=false; clear
 
 /* ---------- reader ---------- */
 let task=null, observer=null, openItem=null;
+const openDoc=(url)=>{ const PJ="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; return pdfjsLib.getDocument({url,disableFontFace:true,cMapUrl:PJ+"cmaps/",cMapPacked:true,standardFontDataUrl:PJ+"standard_fonts/"}); };
 if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 async function openReader(it){
   openItem=it;
-  $("rtitle").textContent=it.title; $("open").href=it.file; $("dl").href=it.file; $("dl").setAttribute("download",it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf");
+  $("rtitle").textContent=it.title; $("open").href=CDN+it.file; $("dl").href=CDN+it.file; $("dl").setAttribute("download",it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf");
   $("reader").hidden=false; document.body.style.overflow="hidden";
   const box=$("pages"); box.textContent=""; box.scrollTop=0;
   const st=document.createElement("div"); st.className="status"; st.textContent="بيفتح الملخص…"; box.append(st);
@@ -211,8 +213,9 @@ async function openReader(it){
   if(!window.pdfjsLib){ st.textContent="مقدرناش نعرض الملف هنا. دوس «فتح» فوق."; return; }
   try{
     if(task) task.destroy();
-    const PJ="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; task=pdfjsLib.getDocument({url:it.file,disableFontFace:true,cMapUrl:PJ+"cmaps/",cMapPacked:true,standardFontDataUrl:PJ+"standard_fonts/"});
-    const pdf=await task.promise;
+    let pdf;
+    try{ task=openDoc(CDN+it.file); pdf=await task.promise; }
+    catch(err){ if(openItem!==it) return; task=openDoc(it.file); pdf=await task.promise; }
     if(openItem!==it) return;
     st.remove();
     observer&&observer.disconnect();
@@ -235,6 +238,7 @@ async function drawPage(pdf,n,holder){
 }
 function closeReader(){ $("reader").hidden=true; document.body.style.overflow=""; openItem=null; if(task){task.destroy();task=null;} observer&&observer.disconnect(); $("pages").textContent=""; }
 $("close").onclick=closeReader;
+$("dl").addEventListener("click",async e=>{ const it=openItem; if(!it) return; e.preventDefault(); toast("بيتحمّل الملف…"); const name=it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf"; let blob; try{ blob=await (await fetch(CDN+it.file)).blob(); }catch(x){ try{ blob=await (await fetch(it.file)).blob(); }catch(y){} } if(!blob){ toast("التحميل وقف، جرّب «فتح»"); return; } const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("reader").hidden) closeReader(); });
 
 
