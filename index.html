@@ -81,6 +81,14 @@ section h2 small{font-family:var(--body);font-weight:400;font-size:.85rem;color:
 .page canvas{width:100%;height:auto;display:block;border-radius:4px}
 .status{color:var(--muted);padding:30px;text-align:center}
 .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;font-size:.88rem;z-index:30}
+.pages{direction:ltr;--z:1;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}
+.page{width:calc(100% * var(--z));max-width:calc(820px * var(--z));flex:none}
+.pages.zoomed{align-items:flex-start}
+.zoom{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);direction:ltr;display:flex;align-items:center;gap:4px;padding:4px;background:var(--sheet);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow);z-index:2}
+.zoom button{font:inherit;font-size:1.25rem;line-height:1;width:40px;height:40px;border-radius:999px;border:0;background:var(--tint);color:var(--ink);cursor:pointer}
+.zoom button:disabled{opacity:.35;cursor:default}
+.zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.zoom span{min-width:56px;text-align:center;font-weight:600;font-size:.9rem;font-variant-numeric:tabular-nums}
 @media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.head{padding-block:16px 10px}.btn .lbl{display:none}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 </style>
@@ -118,11 +126,11 @@ section h2 small{font-family:var(--body);font-weight:400;font-size:.85rem;color:
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg><span class="lbl">تحميل</span></a>
   </div>
   <div class="pages" id="pages"></div>
+  <div class="zoom" role="group" aria-label="حجم الصفحة"><button id="zout" type="button" aria-label="تصغير">−</button><span id="zlabel" aria-live="polite">١٠٠٪</span><button id="zin" type="button" aria-label="تكبير">+</button></div>
 </div>
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 <script>
 const DATA = [{"name":"اطفال نظري","slug":"peds-theory","items":[{"title":"Accident Prevention","file":"files/peds-theory-1.pdf","orig":"Accident prevention Sum.pdf","pages":9,"size":1718729,"thumb":"thumbs/peds-theory-1.jpg"},{"title":"Breast Feeding","file":"files/peds-theory-2.pdf","orig":"Breast Feeding Sum.pdf","pages":13,"size":2045009,"thumb":"thumbs/peds-theory-2.jpg"},{"title":"Ethical Principles & Legal Issues","file":"files/peds-theory-3.pdf","orig":"Ethical Principles, Legal Issues (1).pdf","pages":14,"size":2195080,"thumb":"thumbs/peds-theory-3.jpg"},{"title":"GIT Anomalies","file":"files/peds-theory-4.pdf","orig":"GIT_Aomalies Sum 4.pdf","pages":9,"size":1545446,"thumb":"thumbs/peds-theory-4.jpg"},{"title":"Hospitalization","file":"files/peds-theory-5.pdf","orig":"Hospitalization Sum (2).pdf","pages":8,"size":2083301,"thumb":"thumbs/peds-theory-5.jpg"},{"title":"Perspectives of Pediatric Nursing","file":"files/peds-theory-6.pdf","orig":"Perspectives of pediatric nursing SUM.pdf 2 (1).pdf","pages":14,"size":3004029,"thumb":"thumbs/peds-theory-6.jpg"},{"title":"High-Risk Neonate","file":"files/peds-theory-7.pdf","orig":"high risk neonate Sum.pdf","pages":11,"size":1621767,"thumb":"thumbs/peds-theory-7.jpg"},{"title":"Play","file":"files/peds-theory-8.pdf","orig":"play Sum (1).pdf","pages":9,"size":1303895,"thumb":"thumbs/peds-theory-8.jpg"},{"title":"Neonatal Hyperbilirubinemia","file":"files/peds-theory-9.pdf","orig":"Neonatal HyperbilirubiSum.pdf","pages":16,"size":2153936,"thumb":"thumbs/peds-theory-9.jpg"},{"title":"CNS Congenital Anomalies","file":"files/peds-theory-10.pdf","orig":"CNS — Sum.pdf","pages":12,"size":1855415,"thumb":"thumbs/peds-theory-10.jpg"},{"title":"Nephrotic Syndrome & Acute Glomerulonephritis","file":"files/peds-theory-11.pdf","orig":"Nephrotic Syndrome & Acute Glomerulonephritis Sum.pdf","pages":11,"size":1749246,"thumb":"thumbs/peds-theory-11.jpg"},{"title":"Rheumatic Fever","file":"files/peds-theory-12.pdf","orig":"Rheumatic Fever Sum.pdf","pages":10,"size":1641244,"thumb":"thumbs/peds-theory-12.jpg"}]},{"name":"اطفال عملي","slug":"peds-lab","items":[]},{"name":"طب اطفال","slug":"peds-med","items":[{"title":"Ethical Approach","file":"files/peds-med-1.pdf","orig":"Ethical approach Sum.pdf","pages":7,"size":1744889,"thumb":"thumbs/peds-med-1.jpg"},{"title":"Pediatric Medicolegal Dilemmas","file":"files/peds-med-2.pdf","orig":"Pediatric Medicolegal Dilemmas Sum.pdf","pages":8,"size":1565434,"thumb":"thumbs/peds-med-2.jpg"},{"title":"Physical Assessment","file":"files/peds-med-3.pdf","orig":"Physical Assessment  Sum.pdf","pages":8,"size":1582138,"thumb":"thumbs/peds-med-3.jpg"},{"title":"Congenital Heart Disease","file":"files/peds-med-4.pdf","orig":"Congenital Heart Disease Sum.pdf","pages":9,"size":1471533,"thumb":"thumbs/peds-med-4.jpg"}]},{"name":"جراحه اطفال","slug":"peds-surg","items":[{"title":"CHPS & TOF","file":"files/peds-surg-1.pdf","orig":"CHPS TOF Sum.pdf","pages":6,"size":1328207,"thumb":"thumbs/peds-surg-1.jpg"},{"title":"OIH, Hydro & UDT Nursing","file":"files/peds-surg-2.pdf","orig":"OIH_Hydro_UDT_nursing Sum.pdf","pages":8,"size":1715555,"thumb":"thumbs/peds-surg-2.jpg"},{"title":"Pediatric Surgical Care","file":"files/peds-surg-3.pdf","orig":"Pediatric SURGICAL CARE.pdf","pages":9,"size":2010144,"thumb":"thumbs/peds-surg-3.jpg"},{"title":"Intussusception & Anorectal Malformations","file":"files/peds-surg-4.pdf","orig":"Intussusception Sum.pdf","pages":10,"size":1692907,"thumb":"thumbs/peds-surg-4.jpg"}]},{"name":"نمو وتطور","slug":"growth","items":[{"title":"Concepts of Growth","file":"files/growth-1.pdf","orig":"Concepts of Growth (1).pdf","pages":9,"size":8901711,"thumb":"thumbs/growth-1.jpg"},{"title":"Erikson’s Psychosocial Theory","file":"files/growth-2.pdf","orig":"Erikson’s Psychosocial Theory Sum.pdf","pages":7,"size":1366810,"thumb":"thumbs/growth-2.jpg"},{"title":"Freud’s Psychosexual Theory","file":"files/growth-3.pdf","orig":"Freud’s Psychosexual Theory Sum.pdf","pages":6,"size":1326225,"thumb":"thumbs/growth-3.jpg"},{"title":"Kohlberg’s Moral Development","file":"files/growth-4.pdf","orig":"Kohlberg’s Moral Development Sum.pdf","pages":6,"size":1363455,"thumb":"thumbs/growth-4.jpg"},{"title":"Piaget’s Cognitive Theory","file":"files/growth-5.pdf","orig":"Piaget’s Cognitive Theory Sum.pdf","pages":7,"size":1613418,"thumb":"thumbs/growth-5.jpg"},{"title":"Assessment of Growth & Development","file":"files/growth-6.pdf","orig":"Assessment of Growth and Development Sum.pdf","pages":8,"size":1497517,"thumb":"thumbs/growth-6.jpg"},{"title":"Adjustment to Extra-Uterine Life","file":"files/growth-7.pdf","orig":"Adjustment to Extra-Uterine Life Sum.pdf","pages":8,"size":1611203,"thumb":"thumbs/growth-7.jpg"},{"title":"Assessment & Management of the Newborn","file":"files/growth-8.pdf","orig":"Newborn Assessment & Nursing Management Sum.pdf","pages":10,"size":1859178,"thumb":"thumbs/growth-8.jpg"},{"title":"Growth, Development & Care of the Infant","file":"files/growth-9.pdf","orig":"Infant Growth, Development & Health Promotion Sum.pdf","pages":9,"size":1641044,"thumb":"thumbs/growth-9.jpg"}]},{"name":"قضايا","slug":"issues","items":[{"title":"Problems Arising from Population Growth","file":"files/issues-1.pdf","orig":"Problems Arising from Population Growth Sum.pdf","pages":8,"size":1539229,"thumb":"thumbs/issues-1.jpg"},{"title":"Environmental System & Ecosystem","file":"files/issues-2.pdf","orig":"Environmental System & Ecosystem Sum.pdf","pages":7,"size":1589298,"thumb":"thumbs/issues-2.jpg"},{"title":"Desertification & Sustainable Development","file":"files/issues-3.pdf","orig":"Desertification & Sustainable Development Sum.pdf","pages":6,"size":1335194,"thumb":"thumbs/issues-3.jpg"},{"title":"Reproductive Health & Family Planning","file":"files/issues-4.pdf","orig":"Reproductive Health & Family Planning Sum.pdf","pages":10,"size":1719953,"thumb":"thumbs/issues-4.jpg"}]},{"name":"نسا","slug":"maternity","items":[{"title":"Anatomy of the Female Reproductive System","file":"files/maternity-1.pdf","orig":"Anatomy Sum.pdf","pages":10,"size":1460133,"thumb":"thumbs/maternity-1.jpg"},{"title":"Menstrual Cycle","file":"files/maternity-2.pdf","orig":"Menstrual Cycle Sum.pdf","pages":13,"size":1510824,"thumb":"thumbs/maternity-2.jpg"},{"title":"Preconception Care","file":"files/maternity-3.pdf","orig":"Preconception Care Sum.pdf","pages":12,"size":1573711,"thumb":"thumbs/maternity-3.jpg"},{"title":"Physiological Changes During Pregnancy","file":"files/maternity-4.pdf","orig":"physiological changes in pregnancy Sum.pdf","pages":15,"size":1979372,"thumb":"thumbs/maternity-4.jpg"},{"title":"Ethical & Legal Issues","file":"files/maternity-5.pdf","orig":"Ethical & Legal Issues in Maternal Sum.pdf","pages":8,"size":1362018,"thumb":"thumbs/maternity-5.jpg"}]},{"name":"استراتيجيات","slug":"strategies","items":[{"title":"Role of the Teacher & Ethics in Nursing Education","file":"files/strategies-1.pdf","orig":"Role oF The Teacher.pdf","pages":8,"size":1858222,"thumb":"thumbs/strategies-1.jpg"}]},{"name":"انجيلزي 3","slug":"english3","items":[]}];
 const NAMES = {"اطفال نظري":"أطفال نظري","اطفال عملي":"أطفال عملي","طب اطفال":"طب أطفال","جراحه اطفال":"جراحة أطفال","نمو وتطور":"نمو وتطور","قضايا":"قضايا","استراتيجيات":"استراتيجيات","انجيلزي 3":"إنجليزي 3"};
@@ -199,45 +207,87 @@ function render(){
 function toast(msg){const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2400);}
 
 /* ---------- reader ---------- */
-let task=null, observer=null, openItem=null;
-const openDoc=(url)=>{ const PJ="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"; return pdfjsLib.getDocument({url,disableFontFace:true,cMapUrl:PJ+"cmaps/",cMapPacked:true,standardFontDataUrl:PJ+"standard_fonts/"}); };
-if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
+let task=null, observer=null, openItem=null, curPdf=null, zoom=1, pinch=1, renderGen=0;
+const ZOOMS=[1,1.5,2,2.5,3];
+const PJ="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+const openDoc=(url)=>pdfjsLib.getDocument({url,disableFontFace:true,cMapUrl:PJ+"cmaps/",cMapPacked:true,standardFontDataUrl:PJ+"standard_fonts/"});
+if (window.pdfjsLib){ try{ pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob(['importScripts("'+PJ+'pdf.worker.min.js");'],{type:"text/javascript"})); }catch(e){ pdfjsLib.GlobalWorkerOptions.workerSrc=PJ+"pdf.worker.min.js"; } }
+const near=new Set();
+function targetWidth(holder){
+  const dpr=Math.min(window.devicePixelRatio||1,3);
+  const w=(holder.clientWidth||800)*dpr*Math.max(1,Math.min(pinch,3));
+  const ar=+holder.dataset.ar||1.414;
+  return Math.floor(Math.min(w,4096,Math.sqrt(16e6/ar)));
+}
+function applyZoom(){
+  const box=$("pages"), ratio=box.scrollHeight?box.scrollTop/box.scrollHeight:0;
+  box.style.setProperty("--z",zoom); box.classList.toggle("zoomed",zoom>1);
+  $("zlabel").textContent=Math.round(zoom*100)+"٪";
+  $("zout").disabled=zoom<=ZOOMS[0]; $("zin").disabled=zoom>=ZOOMS[ZOOMS.length-1];
+  requestAnimationFrame(()=>{ box.scrollTop=ratio*box.scrollHeight; box.scrollLeft=(box.scrollWidth-box.clientWidth)/2; refresh(); });
+}
+function refresh(){ near.forEach(h=>schedule(h)); }
+const queue=[]; let busy=false;
+function schedule(h){ if(!queue.includes(h)) queue.push(h); pump(); }
+async function pump(){
+  if(busy||!curPdf) return; busy=true;
+  while(queue.length){
+    const h=queue.shift(); if(!near.has(h)||!h.isConnected) continue;
+    const want=targetWidth(h); if(+h.dataset.w===want) continue;
+    const gen=renderGen;
+    try{
+      const page=await curPdf.getPage(+h.dataset.n); if(gen!==renderGen) break;
+      const base=page.getViewport({scale:1}); h.dataset.ar=base.height/base.width;
+      const vp=page.getViewport({scale:want/base.width});
+      const c=document.createElement("canvas"); c.width=Math.floor(vp.width); c.height=Math.floor(vp.height);
+      await page.render({canvasContext:c.getContext("2d",{alpha:false}),viewport:vp}).promise;
+      if(gen!==renderGen||!near.has(h)) { c.width=c.height=0; continue; }
+      const old=h.querySelector("canvas"); if(old){ old.width=old.height=0; old.remove(); }
+      h.style.aspectRatio=""; h.append(c); h.dataset.w=want;
+    }catch(e){ if(gen!==renderGen) break; }
+  }
+  busy=false;
+}
+function release(h){ const c=h.querySelector("canvas"); if(c){ h.style.aspectRatio="1 / "+(h.dataset.ar||1.414); c.width=c.height=0; c.remove(); } h.dataset.w=""; }
 async function openReader(it){
-  openItem=it;
+  openItem=it; renderGen++; zoom=1;
   $("rtitle").textContent=it.title; $("open").href=CDN+it.file; $("dl").href=CDN+it.file; $("dl").setAttribute("download",it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf");
   $("reader").hidden=false; document.body.style.overflow="hidden";
-  const box=$("pages"); box.textContent=""; box.scrollTop=0;
+  if(!history.state||!history.state.reader){ try{ history.pushState({reader:true},""); }catch(e){} }
+  const box=$("pages"); box.textContent=""; box.scrollTop=0; near.clear(); queue.length=0; applyZoom();
   const st=document.createElement("div"); st.className="status"; st.textContent="بيفتح الملخص…"; box.append(st);
   $("close").focus();
   if(!window.pdfjsLib){ st.textContent="مقدرناش نعرض الملف هنا. دوس «فتح» فوق."; return; }
   try{
-    if(task) task.destroy();
+    if(task) task.destroy(); curPdf=null;
     let pdf;
     try{ task=openDoc(CDN+it.file); pdf=await task.promise; }
     catch(err){ if(openItem!==it) return; task=openDoc(it.file); pdf=await task.promise; }
     if(openItem!==it) return;
-    st.remove();
+    curPdf=pdf; st.remove();
     observer&&observer.disconnect();
-    observer=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ observer.unobserve(e.target); drawPage(pdf,+e.target.dataset.n,e.target);} }),{root:box,rootMargin:"600px 0px"});
+    observer=new IntersectionObserver(es=>es.forEach(e=>{ const h=e.target; if(e.isIntersecting){ near.add(h); schedule(h); } else { near.delete(h); release(h); } }),{root:box,rootMargin:"1200px 600px"});
     const first=await pdf.getPage(1); const vp=first.getViewport({scale:1});
     for(let i=1;i<=pdf.numPages;i++){
-      const d=document.createElement("div"); d.className="page"; d.dataset.n=i;
+      const d=document.createElement("div"); d.className="page"; d.dataset.n=i; d.dataset.ar=vp.height/vp.width;
       d.style.aspectRatio=`${vp.width} / ${vp.height}`;
       box.append(d); observer.observe(d);
     }
   }catch(e){ if(openItem===it) st.textContent="حصلت مشكلة وإحنا بنفتح الملف. دوس «فتح» فوق."; }
 }
-async function drawPage(pdf,n,holder){
-  const page=await pdf.getPage(n);
-  const w=holder.clientWidth||800, dpr=Math.min(window.devicePixelRatio||1,2.5);
-  const vp=page.getViewport({scale:(w*dpr)/page.getViewport({scale:1}).width});
-  const c=document.createElement("canvas"); c.width=vp.width; c.height=vp.height;
-  holder.style.aspectRatio=""; holder.append(c);
-  await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
+function closeReader(fromPop){
+  if($("reader").hidden) return;
+  $("reader").hidden=true; document.body.style.overflow=""; openItem=null; renderGen++; curPdf=null;
+  if(task){task.destroy();task=null;} observer&&observer.disconnect(); near.clear(); queue.length=0;
+  $("pages").querySelectorAll("canvas").forEach(c=>{c.width=c.height=0;}); $("pages").textContent="";
+  if(!fromPop&&history.state&&history.state.reader){ try{ history.back(); }catch(e){} }
 }
-function closeReader(){ $("reader").hidden=true; document.body.style.overflow=""; openItem=null; if(task){task.destroy();task=null;} observer&&observer.disconnect(); $("pages").textContent=""; }
-$("close").onclick=closeReader;
+window.addEventListener("popstate",()=>{ if(!$("reader").hidden) closeReader(true); });
+$("zin").onclick=()=>{ const i=ZOOMS.indexOf(zoom); if(i<ZOOMS.length-1){ zoom=ZOOMS[i+1]; applyZoom(); } };
+$("zout").onclick=()=>{ const i=ZOOMS.indexOf(zoom); if(i>0){ zoom=ZOOMS[i-1]; applyZoom(); } };
+let pinchT; if(window.visualViewport) visualViewport.addEventListener("resize",()=>{ clearTimeout(pinchT); pinchT=setTimeout(()=>{ const s=visualViewport.scale||1; if(Math.abs(s-pinch)>0.15){ pinch=s; if(curPdf) refresh(); } },250); });
+let rszT; window.addEventListener("resize",()=>{ clearTimeout(rszT); rszT=setTimeout(()=>{ if(curPdf) refresh(); },300); });
+$("close").onclick=()=>closeReader(false);
 $("dl").addEventListener("click",async e=>{ const it=openItem; if(!it) return; e.preventDefault(); toast("بيتحمّل الملف…"); const name=it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf"; let blob; try{ blob=await (await fetch(CDN+it.file)).blob(); }catch(x){ try{ blob=await (await fetch(it.file)).blob(); }catch(y){} } if(!blob){ toast("التحميل وقف، جرّب «فتح»"); return; } const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("reader").hidden) closeReader(); });
 
