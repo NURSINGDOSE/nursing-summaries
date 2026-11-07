@@ -206,6 +206,7 @@ function renderQ(){
   if(cfg.final) badges.append(el("span",{class:"badge"},`محاضرة ${ar(q.lec)}`));
   q.srcs.forEach(s=>badges.append(el("span",{class:"badge"+(s.startsWith("NCLEX")?" ncl":"")},s)));
   if(q.hot) badges.append(el("span",{class:"badge hot"},"🔥 متكرر في الامتحانات"));
+  if(q.sug) badges.append(el("span",{class:"badge",title:"المصدر مكانش فيه إجابة رسمية"},"إجابة مقترحة"));
   card.append(badges);
   card.append(el("div",{class:"qtext"},el("span",{class:"qid"},q.id),q.q));
   if(q.img) card.append(el("img",{class:"fig",src:IMGS[q.img],alt:"الصورة اللي في السؤال"}));
