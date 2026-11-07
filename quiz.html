@@ -209,7 +209,7 @@ function renderQ(){
   if(q.sug) badges.append(el("span",{class:"badge",title:"المصدر مكانش فيه إجابة رسمية"},"إجابة مقترحة"));
   card.append(badges);
   card.append(el("div",{class:"qtext"},el("span",{class:"qid"},q.id),q.q));
-  if(q.img) card.append(el("img",{class:"fig",src:IMGS[q.img],alt:"الصورة اللي في السؤال"}));
+  if(q.img){ const im=el("img",{class:"fig",src:IMGS[q.img]||(CDN+q.img),alt:"الصورة اللي في السؤال"}); im.onerror=()=>{ im.onerror=null; im.src=q.img; }; card.append(im); }
   if(q.multi) card.append(el("p",{class:"hint"},"اختار كل الإجابات الصح، وبعدين دوس «تأكيد الإجابة»."));
   const opts=el("div",{class:"opts",role:q.multi?"group":"radiogroup"}); const chosen=new Set(); let done=false;
   const fbBox=el("div"); const nextBtn=el("button",{class:"primary",type:"button",hidden:true},i+1<qs.length?"السؤال اللي بعده":"شوف النتيجة");
