@@ -3,283 +3,298 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one column app — lecture list → quiz (one question at a time, instant feedback) → result. Same palette as the summaries site. */
+/* Calm reading page in the summaries site's palette. Content sits on the page, not in boxes; one radius; no shadows. */
 :root{
-  --paper:#f3f6f5; --sheet:#ffffff; --ink:#132b27; --muted:#5b6f6b; --line:#d7e1de;
+  --paper:#f3f6f5; --sheet:#ffffff; --ink:#132b27; --soft:#2e4541; --muted:#5b6f6b; --line:#d7e1de;
   --accent:#17705f; --accent-ink:#ffffff; --tint:#e3efeb; --mark:#f0c45a;
-  --ok:#1f8a4c; --ok-bg:#e4f4ea; --bad:#c2410c; --bad-bg:#fdece4; --hot:#b45309; --hot-bg:#fdf1dc;
-  --shadow:0 1px 2px rgba(19,43,39,.06),0 6px 20px rgba(19,43,39,.07);
+  --ok:#17705f; --ok-bg:#e3efeb; --no:#b0493d; --no-bg:#f8e9e6;
   --display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --body:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;
   --en:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --r:12px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0f1817; --sheet:#16211f; --ink:#e3ece9; --muted:#9db0ab; --line:#28403b;
+  --paper:#0f1817; --sheet:#16211f; --ink:#e3ece9; --soft:#c9d6d2; --muted:#9db0ab; --line:#28403b;
   --accent:#4fbfa6; --accent-ink:#06201b; --tint:#1b2e2a; --mark:#e2b74f;
-  --ok:#5fd394; --ok-bg:#12301f; --bad:#ff8a5c; --bad-bg:#3a1d12; --hot:#f2b65a; --hot-bg:#33270f;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+  --ok:#5fcfb4; --ok-bg:#173029; --no:#ec8f80; --no-bg:#35201c; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#0f1817; --sheet:#16211f; --ink:#e3ece9; --muted:#9db0ab; --line:#28403b;
+  --paper:#0f1817; --sheet:#16211f; --ink:#e3ece9; --soft:#c9d6d2; --muted:#9db0ab; --line:#28403b;
   --accent:#4fbfa6; --accent-ink:#06201b; --tint:#1b2e2a; --mark:#e2b74f;
-  --ok:#5fd394; --ok-bg:#12301f; --bad:#ff8a5c; --bad-bg:#3a1d12; --hot:#f2b65a; --hot-bg:#33270f;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+  --ok:#5fcfb4; --ok-bg:#173029; --no:#ec8f80; --no-bg:#35201c; color-scheme:dark}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.65;direction:rtl}
-.wrap{max-width:760px;margin:0 auto;padding-inline:18px;padding-block:18px 64px}
+html{background:var(--paper);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
 button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:680px;margin:0 auto;padding:20px 18px 80px}
 
-.top{display:flex;align-items:center;gap:12px;padding-block:6px 14px}
-.top h1{font-family:var(--display);font-size:clamp(1.25rem,4vw,1.6rem);margin:0;line-height:1.25;flex:1;min-width:0}
-.top h1 small{display:block;font-family:var(--body);font-weight:400;font-size:.85rem;color:var(--muted)}
-.back{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--sheet);cursor:pointer;display:grid;place-items:center}
-.pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--tint);color:var(--accent)}
+/* top line */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;font-size:.92rem}
+.top a,.top button{background:none;border:0;padding:6px 0;color:var(--accent);font-weight:600;text-decoration:none;cursor:pointer}
+.top .where{color:var(--muted)}
 
-.note{background:var(--hot-bg);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:.9rem;margin-bottom:18px;border:1px solid color-mix(in srgb,var(--hot) 30%,transparent)}
-.note b{color:var(--hot)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,5vw,2rem);line-height:1.25;margin:0}
+.lead{color:var(--muted);margin:6px 0 0}
 
-.list{display:grid;gap:10px}
-.lec{display:flex;align-items:center;gap:14px;width:100%;text-align:start;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;transition:transform .12s,box-shadow .12s}
-.lec:hover:not(:disabled){transform:translateY(-1px);box-shadow:var(--shadow)}
-.lec:disabled{cursor:default;opacity:.55}
-.lec .num{flex:none;width:40px;height:40px;border-radius:10px;background:var(--tint);color:var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums}
-.lec .txt{flex:1;min-width:0;display:grid;gap:1px}
-.lec .en{font-family:var(--en);font-weight:600;direction:ltr;text-align:right;line-height:1.35}
-.lec .ar{font-size:.85rem;color:var(--muted)}
-.lec .side{flex:none;display:grid;justify-items:end;gap:4px;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.best{font-weight:600;color:var(--ok)}
-.lec.final{border:2px solid var(--accent)}
-.lec.final .num{background:var(--accent);color:var(--accent-ink)}
-.sep{font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--muted);margin:18px 2px 2px}
+/* lecture list: rows on the page with hairlines */
+.list{list-style:none;margin:26px 0 0;padding:0;border-top:1px solid var(--line)}
+.list li{border-bottom:1px solid var(--line)}
+.row{display:grid;grid-template-columns:2.2rem 1fr auto;align-items:center;gap:12px;width:100%;text-align:start;background:none;border:0;padding:15px 4px;cursor:pointer}
+.row:hover:not(:disabled){background:var(--tint)}
+.row:disabled{opacity:.5;cursor:default}
+.row .n{font-family:var(--display);font-weight:700;font-size:1.15rem;color:var(--accent);text-align:center;font-variant-numeric:tabular-nums}
+.row .en{display:block;font-family:var(--en);font-weight:500;direction:ltr;text-align:right;line-height:1.4}
+.row .ar{display:block;font-size:.86rem;color:var(--muted);line-height:1.5;margin-top:2px}
+.row .side{text-align:left;font-size:.84rem;color:var(--muted);white-space:nowrap;line-height:1.5}
+.row .best{display:block;color:var(--accent);font-weight:600}
+.final{margin-top:30px;background:var(--tint);border-radius:var(--r)}
+.final .row{padding:18px 12px}
+.final .row:hover{background:transparent}
+.final .n{font-size:1.3rem}
+.final .en{font-weight:600}
 
-.card{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:18px}
-.intro h2{font-family:var(--en);direction:ltr;text-align:right;font-size:1.2rem;margin:0 0 4px;line-height:1.35}
-.intro p{margin:0 0 14px;color:var(--muted)}
-.label{font-family:var(--display);font-weight:600;font-size:.9rem;margin:14px 0 8px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.9rem}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.chip .c{font-weight:400;opacity:.8;font-variant-numeric:tabular-nums}
-.primary{display:block;width:100%;margin-top:20px;border:0;border-radius:12px;padding:13px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:700;font-size:1rem;cursor:pointer}
-.primary:disabled{opacity:.4;cursor:default}
-.ghost{display:block;width:100%;margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--sheet);font-family:var(--display);font-weight:600;cursor:pointer}
+/* intro */
+.intro h1{font-family:var(--en);font-weight:600;direction:ltr;text-align:right;font-size:1.45rem}
+.field{margin-top:24px}
+.field h2{font-family:var(--display);font-size:.98rem;font-weight:600;margin:0 0 10px;color:var(--soft)}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:9px 14px;cursor:pointer;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.seg .c{opacity:.75;font-size:.85rem;margin-inline-start:4px}
+.btn{display:block;width:100%;border:0;border-radius:var(--r);padding:15px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:600;font-size:1.02rem;cursor:pointer;margin-top:28px}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.line{background:none;color:var(--accent);border:1px solid var(--line);margin-top:10px}
 
-.bar{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px}
-.track{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
-.fill{height:100%;background:var(--accent);border-radius:99px;transition:width .25s}
-.score{font-weight:600;color:var(--ink)}
-.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.badge{font-size:.75rem;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--tint);color:var(--muted)}
-.badge.hot{background:var(--hot-bg);color:var(--hot)}
-.badge.ncl{color:var(--accent)}
-.qtext{font-family:var(--en);direction:ltr;text-align:left;font-size:1.08rem;font-weight:500;line-height:1.55;margin:4px 0 14px}
-.qtext .qid{font-weight:600;color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
-.fig{display:block;max-width:100%;max-height:300px;margin:0 auto 14px;border-radius:10px;border:1px solid var(--line);background:#fff}
-.hint{font-size:.85rem;color:var(--muted);margin:-6px 0 10px}
-.opts{display:grid;gap:9px;direction:ltr}
-.opt{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;font-family:var(--en);border:1.5px solid var(--line);background:var(--sheet);border-radius:12px;padding:11px 12px;cursor:pointer;line-height:1.45;transition:border-color .12s,background .12s}
+/* progress line under the top bar */
+.prog{height:3px;background:var(--line);border-radius:3px;overflow:hidden;margin:-12px 0 24px}
+.prog span{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+/* question */
+.from{font-size:.86rem;color:var(--muted);margin:0 0 10px}
+.from .hot{color:var(--ink);font-weight:600}
+.from .hot::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mark);margin-inline-end:6px;vertical-align:middle}
+.q{font-family:var(--en);direction:ltr;text-align:left;font-size:1.14rem;line-height:1.65;margin:0 0 20px;font-weight:500}
+.q .id{color:var(--muted);font-weight:400;margin-right:8px;font-size:.92em}
+.fig{display:block;max-width:100%;max-height:300px;margin:0 auto 20px;border-radius:var(--r);background:#fff}
+.tip{font-size:.9rem;color:var(--muted);margin:-8px 0 14px}
+
+.opts{display:grid;gap:10px;direction:ltr}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;cursor:pointer;font-family:var(--en);font-size:1rem;line-height:1.5;color:var(--ink)}
 .opt:hover:not([disabled]){border-color:var(--accent)}
-.opt .k{flex:none;width:26px;height:26px;border-radius:7px;background:var(--tint);display:grid;place-items:center;font-weight:600;font-size:.85rem;color:var(--muted);text-transform:lowercase}
+.opt .k{flex:none;width:1.4rem;color:var(--muted);font-weight:600}
+.opt .t{flex:1;min-width:0}
+.opt .ic{flex:none;width:20px;height:20px;margin-top:2px}
 .opt.sel{border-color:var(--accent);background:var(--tint)}
-.opt.sel .k{background:var(--accent);color:var(--accent-ink)}
+.opt.sel .k{color:var(--accent)}
 .opt.right{border-color:var(--ok);background:var(--ok-bg)}
-.opt.right .k{background:var(--ok);color:#fff}
-.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
-.opt.wrong .k{background:var(--bad);color:#fff}
+.opt.right .k{color:var(--ok)}
+.opt.wrong{border-color:var(--no);background:var(--no-bg)}
+.opt.wrong .k{color:var(--no)}
+.opt.dim{opacity:.55}
 .opt[disabled]{cursor:default}
-.fb{margin-top:14px;border-radius:12px;padding:12px 14px;border:1px solid var(--line)}
-.fb.ok{background:var(--ok-bg);border-color:color-mix(in srgb,var(--ok) 35%,transparent)}
-.fb.bad{background:var(--bad-bg);border-color:color-mix(in srgb,var(--bad) 35%,transparent)}
-.fb .v{font-family:var(--display);font-weight:700;margin-bottom:4px}
-.fb.ok .v{color:var(--ok)} .fb.bad .v{color:var(--bad)}
-.fb .ansline{font-size:.9rem;margin-bottom:6px}
-.fb .ansline span{font-family:var(--en);direction:ltr;unicode-bidi:isolate;font-weight:600}
-.fb p{margin:0}
-.reveal{border:1.5px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);text-align:center;font-size:.92rem}
-.reveal .ansbig{font-family:var(--en);direction:ltr;color:var(--ink);font-weight:600;font-size:1.02rem;margin-bottom:4px}
-.self{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.self button{border-radius:12px;padding:12px;font-family:var(--display);font-weight:700;cursor:pointer;border:1.5px solid}
-.self .y{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
-.self .n{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
-.home-link{font-size:.85rem;color:var(--accent);text-decoration:none;font-weight:600;white-space:nowrap}
 
-.res{text-align:center}
-.ring{width:150px;height:150px;margin:6px auto 10px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0)}
-.ring div{width:122px;height:122px;border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-family:var(--display)}
-.ring b{font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
-.ring small{color:var(--muted);font-size:.85rem}
-.res h2{font-family:var(--display);margin:4px 0 2px;font-size:1.25rem}
-.res p{color:var(--muted);margin:0}
-.wl{text-align:start;margin-top:18px;display:grid;gap:8px}
-.wl details{border:1px solid var(--line);border-radius:12px;background:var(--sheet);padding:10px 12px}
-.wl summary{cursor:pointer;font-family:var(--en);direction:ltr;text-align:left;font-weight:500}
-.wl .a{margin-top:8px;font-size:.92rem}
-.wl .a .en{font-family:var(--en);direction:ltr;unicode-bidi:isolate;font-weight:600;color:var(--ok)}
-.wl .a .yours{font-family:var(--en);direction:ltr;unicode-bidi:isolate;color:var(--bad)}
-@media (max-width:480px){.wrap{padding-inline:14px}.card{padding:15px}.lec{padding:12px;gap:11px}}
+/* fill-in questions */
+.blank{border:1px dashed var(--line);border-radius:var(--r);padding:14px;font-family:var(--en);direction:ltr;text-align:left;color:var(--muted);min-height:52px}
+.blank.shown{border-style:solid;border-color:var(--accent);color:var(--ink);background:var(--tint);font-weight:500}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.pair button{border-radius:var(--r);padding:13px;font-family:var(--display);font-weight:600;cursor:pointer;background:var(--sheet);border:1px solid var(--line)}
+.pair .y{color:var(--ok)}
+.pair .n{color:var(--no)}
+
+/* explanation */
+.why{margin-top:22px;padding:2px 16px 2px 0;border-right:3px solid var(--ok)}
+.why.no{border-right-color:var(--no)}
+.why .v{font-family:var(--display);font-weight:600;color:var(--ok);margin:0 0 4px}
+.why.no .v{color:var(--no)}
+.why .ans{margin:0 0 8px;font-size:.95rem}
+.why .ans span{font-family:var(--en);direction:ltr;unicode-bidi:isolate;font-weight:600}
+.why p.x{margin:0;font-size:1.02rem;line-height:1.95;color:var(--soft)}
+
+/* result */
+.res{text-align:center;padding-top:8px}
+.big{font-family:var(--display);font-weight:700;font-size:3.4rem;line-height:1.1;color:var(--accent);font-variant-numeric:tabular-nums;margin:6px 0 0}
+.big small{font-size:1.4rem;color:var(--muted);font-weight:600}
+.pct{color:var(--muted);margin:2px 0 14px}
+.msg{font-family:var(--display);font-weight:600;font-size:1.2rem;margin:0}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:18px auto 4px;max-width:420px;direction:rtl}
+.dots i{width:12px;height:12px;border-radius:3px;background:var(--ok)}
+.dots i.x{background:var(--no)}
+.legend{font-size:.82rem;color:var(--muted);margin:0}
+.review{text-align:start;margin-top:30px}
+.review h2{font-family:var(--display);font-size:1.05rem;font-weight:600;margin:0 0 6px}
+.review details{border-bottom:1px solid var(--line);padding:12px 0}
+.review summary{cursor:pointer;font-family:var(--en);direction:ltr;text-align:left;line-height:1.55}
+.review .body{margin-top:10px;font-size:.95rem}
+.review .en{font-family:var(--en);direction:ltr;unicode-bidi:isolate;font-weight:600}
+.review .mine{color:var(--no)}
+.review .good{color:var(--ok)}
+.review p{margin:8px 0 0;color:var(--soft);line-height:1.9}
+.loading{text-align:center;padding-top:80px;color:var(--muted)}
+
+@media (max-width:480px){
+  .wrap{padding:16px 14px 72px}
+  .q{font-size:1.08rem}
+  .big{font-size:2.9rem}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-
-</head><body><div class="wrap" id="app"><p style="text-align:center;color:var(--muted);padding-top:40px">بيحمّل الأسئلة…</p></div>
-
+</style></head><body>
+<div class="wrap" id="app"><p class="loading">بيحمّل الأسئلة…</p></div>
 <script>
 let DATA = window.QUIZ_DATA || null;
 const IMGS = {};
+const CDN="https://cdn.jsdelivr.net/gh/NURSINGDOSE/nursing-summaries@main/";
 const ar = n => Number(n).toLocaleString("ar-EG");
 const $app = document.getElementById("app");
+const K = k => (DATA.slug||"x")+"-"+k;
 const store = { get(k){ try{ return JSON.parse(localStorage.getItem("nd-q-"+K(k))); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem("nd-q-"+K(k), JSON.stringify(v)); }catch(e){} } };
 const el = (tag, attrs={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==="class") e.className=v; else if(k.startsWith("on")) e.addEventListener(k.slice(2),v); else if(v!==false&&v!=null) e.setAttribute(k,v===true?"":v); } for(const c of kids.flat()){ if(c==null||c===false) continue; e.append(c.nodeType?c:document.createTextNode(c)); } return e; };
-const svgBack = () => { const s=document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 24 24"); s.setAttribute("width","18"); s.setAttribute("height","18"); s.innerHTML='<path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'; return s; };
 const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const optText = (q,k) => (q.opts.find(o=>o[0]===k)||[k,""])[1];
-const ansText = q => q.complete ? q.ans_text : q.ans.map(k=>k+") "+optText(q,k)).join("  ·  ");
-const K = k => (DATA.slug||"x")+"-"+k;
-
-let state = null;
+const ansText = q => q.complete ? q.ans_text : q.ans.map(k=>k+") "+optText(q,k)).join("   ");
+const icon = ok => { const s=document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 20 20"); s.setAttribute("class","ic"); s.setAttribute("aria-hidden","true");
+  s.innerHTML= ok ? '<path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' : '<path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>';
+  s.style.color= ok ? "var(--ok)" : "var(--no)"; return s; };
+const topBar = (left,right) => el("div",{class:"top"},right,left);
+let state=null;
 
 /* ---------- home ---------- */
 function home(){
-  state=null; $app.textContent="";
-  $app.append(
-    el("div",{class:"top"}, el("h1",{}, "بنك أسئلة "+DATA.name, el("small",{},DATA.en+" · كويز لكل محاضرة وامتحان شامل في الآخر")), el("a",{class:"home-link",href:"./"},"الملخصات ←"))
-  );
-  const list=el("div",{class:"list"});
+  state=null; document.onkeydown=null; $app.textContent="";
+  $app.append(topBar(el("a",{href:"./"},"الملخصات"),el("span",{class:"where"},"بنك الأسئلة")));
+  $app.append(el("h1",{},DATA.name),el("p",{class:"lead"},`${ar(DATA.qs.length)} سؤال من امتحانات الدفعات اللي فاتت، كل سؤال معاه شرح. اختار محاضرة تبدأ بيها.`));
+  const list=el("ul",{class:"list"});
   DATA.lecs.forEach(L=>{
-    const best=store.get("lec"+L.n);
-    list.append(el("button",{class:"lec",type:"button",disabled:L.ready===false,onclick:()=>intro({key:"lec"+L.n,title:L.en,sub:L.ar,pool:DATA.qs.filter(q=>q.lec===L.n),final:false})},
-      el("span",{class:"num"},ar(L.n)),
-      el("span",{class:"txt"}, el("span",{class:"en"},L.en), el("span",{class:"ar"},L.ar)),
-      el("span",{class:"side"}, L.ready!==false?`${ar(DATA.qs.filter(q=>q.lec===L.n).length)} سؤال`:"قريباً", best?el("span",{class:"best"},`أعلى درجة ${ar(best)}٪`):null)
-    ));
+    const n=DATA.qs.filter(q=>q.lec===L.n).length, best=store.get("lec"+L.n);
+    list.append(el("li",{},el("button",{class:"row",type:"button",disabled:L.ready===false||!n,onclick:()=>intro({key:"lec"+L.n,title:L.en,sub:L.ar,pool:DATA.qs.filter(q=>q.lec===L.n),final:false})},
+      el("span",{class:"n"},ar(L.n)),
+      el("span",{},el("span",{class:"en"},L.en),el("span",{class:"ar"},L.ar)),
+      el("span",{class:"side"},`${ar(n)} سؤال`,best!=null?el("span",{class:"best"},`أعلى درجة ${ar(best)}٪`):null))));
   });
-  const readyQs=DATA.qs; const fbest=store.get("final");
-  list.append(el("div",{class:"sep"},"في آخر المادة"),
-    el("button",{class:"lec final",type:"button",onclick:()=>intro({key:"final",title:"Final Exam — All Lectures",sub:"امتحان شامل من كل المحاضرات",pool:readyQs,final:true})},
-      el("span",{class:"num"},"★"),
-      el("span",{class:"txt"}, el("span",{class:"en"},"Final Exam — All Lectures"), el("span",{class:"ar"},"الامتحان الشامل · أسئلة متلخبطة من كل المحاضرات")),
-      el("span",{class:"side"}, `${ar(readyQs.length)} سؤال`, fbest?el("span",{class:"best"},`أعلى درجة ${ar(fbest)}٪`):null)
-    ));
-  $app.append(list);
+  const fbest=store.get("final");
+  $app.append(list,el("div",{class:"final"},el("button",{class:"row",type:"button",onclick:()=>intro({key:"final",title:"Final Exam",sub:"امتحان شامل من كل المحاضرات",pool:DATA.qs,final:true})},
+    el("span",{class:"n"},"✦"),
+    el("span",{},el("span",{class:"en"},"Final Exam"),el("span",{class:"ar"},"امتحان شامل، أسئلة متلخبطة من كل المحاضرات")),
+    el("span",{class:"side"},`${ar(DATA.qs.length)} سؤال`,fbest!=null?el("span",{class:"best"},`أعلى درجة ${ar(fbest)}٪`):null))));
   window.scrollTo({top:0});
 }
 
 /* ---------- intro ---------- */
 function intro(cfg){
-  $app.textContent="";
+  $app.textContent=""; document.onkeydown=null;
   const past=cfg.pool.filter(q=>q.kind==="past"), ncl=cfg.pool.filter(q=>q.kind==="nclex");
   let filter="all", order=cfg.final?"shuffle":"order", size=cfg.final?Math.min(30,cfg.pool.length):0;
-  const back=el("button",{class:"back",type:"button","aria-label":"رجوع",onclick:home},svgBack());
-  $app.append(el("div",{class:"top"},back,el("h1",{},cfg.final?"الامتحان الشامل":"كويز المحاضرة",el("small",{},cfg.sub))));
-  const card=el("div",{class:"card intro"});
-  card.append(el("h2",{},cfg.title), el("p",{},`فيه ${ar(cfg.pool.length)} سؤال: ${ar(past.length)} من امتحانات الدفعات اللي فاتت و${ar(ncl.length)} على طريقة NCLEX. هتجاوب سؤال سؤال، وبعد كل إجابة هتعرف صح ولا غلط ومعاها الشرح.`+(cfg.pool.some(q=>q.complete)?" أسئلة الـ Complete هتفكر فيها وتكشف الإجابة وتقيّم نفسك.":"")));
-  const chip=(label,count,on,fn)=>{ const b=el("button",{class:"chip",type:"button","aria-pressed":String(on),onclick:fn},label," ",el("span",{class:"c"},`(${ar(count)})`)); return b; };
-  const fGroup=el("div",{class:"chips"}), oGroup=el("div",{class:"chips"}), sGroup=el("div",{class:"chips"});
-  const startBtn=el("button",{class:"primary",type:"button"},"ابدأ");
-  const pick=()=> filter==="past"?past:filter==="nclex"?ncl:cfg.pool;
+  $app.append(topBar(el("span",{class:"where"},DATA.name),el("button",{type:"button",onclick:home},"رجوع للمحاضرات")));
+  const box=el("div",{class:"intro"});
+  box.append(el("h1",{},cfg.title),el("p",{class:"lead"},`${cfg.sub}. فيها ${ar(past.length)} سؤال من الامتحانات و${ar(ncl.length)} على طريقة NCLEX.`));
+  const opt=(label,on,fn,count)=>el("button",{type:"button","aria-pressed":String(on),onclick:fn},label,count!=null?el("span",{class:"c"},ar(count)):null);
+  const g1=el("div",{class:"seg"}),g2=el("div",{class:"seg"}),g3=el("div",{class:"seg"});
+  const start=el("button",{class:"btn",type:"button"});
+  const pick=()=>filter==="past"?past:filter==="nclex"?ncl:cfg.pool;
   function draw(){
-    fGroup.textContent=""; oGroup.textContent=""; sGroup.textContent="";
-    fGroup.append(chip("كل الأسئلة",cfg.pool.length,filter==="all",()=>{filter="all";draw();}), chip("امتحانات سابقة",past.length,filter==="past",()=>{filter="past";draw();}), chip("NCLEX",ncl.length,filter==="nclex",()=>{filter="nclex";draw();}));
-    oGroup.append(el("button",{class:"chip",type:"button","aria-pressed":String(order==="order"),onclick:()=>{order="order";draw();}},"بالترتيب"), el("button",{class:"chip",type:"button","aria-pressed":String(order==="shuffle"),onclick:()=>{order="shuffle";draw();}},"عشوائي"));
+    g1.textContent="";g2.textContent="";g3.textContent="";
+    g1.append(opt("كل الأسئلة",filter==="all",()=>{filter="all";draw();},cfg.pool.length),opt("امتحانات سابقة",filter==="past",()=>{filter="past";draw();},past.length),opt("NCLEX",filter==="nclex",()=>{filter="nclex";draw();},ncl.length));
+    g2.append(opt("بالترتيب",order==="order",()=>{order="order";draw();}),opt("عشوائي",order==="shuffle",()=>{order="shuffle";draw();}));
     const n=pick().length;
-    [10,20,30].filter(x=>x<n).forEach(x=>sGroup.append(el("button",{class:"chip",type:"button","aria-pressed":String(size===x),onclick:()=>{size=x;draw();}},`${ar(x)} سؤال`)));
-    sGroup.append(el("button",{class:"chip",type:"button","aria-pressed":String(!size||size>=n),onclick:()=>{size=0;draw();}},`الكل (${ar(n)})`));
+    [10,20,30].filter(x=>x<n).forEach(x=>g3.append(opt(`${ar(x)} سؤال`,size===x,()=>{size=x;draw();})));
+    g3.append(opt("الكل",!size||size>=n,()=>{size=0;draw();},n));
     const total=(!size||size>=n)?n:size;
-    startBtn.textContent=`ابدأ · ${ar(total)} سؤال`; startBtn.disabled=!n;
+    start.textContent=`ابدأ (${ar(total)} سؤال)`; start.disabled=!n;
   }
-  startBtn.onclick=()=>{ let qs=pick(); if(order==="shuffle") qs=shuffle(qs); if(size&&size<qs.length) qs=qs.slice(0,size); start(cfg,qs); };
-  card.append(el("div",{class:"label"},"نوع الأسئلة"),fGroup,el("div",{class:"label"},"الترتيب"),oGroup,el("div",{class:"label"},"عدد الأسئلة"),sGroup,startBtn);
-  $app.append(card); draw(); window.scrollTo({top:0});
+  start.onclick=()=>{ let qs=pick(); if(order==="shuffle") qs=shuffle(qs); if(size&&size<qs.length) qs=qs.slice(0,size); begin(cfg,qs); };
+  box.append(el("div",{class:"field"},el("h2",{},"نوع الأسئلة"),g1),el("div",{class:"field"},el("h2",{},"الترتيب"),g2),el("div",{class:"field"},el("h2",{},"عدد الأسئلة"),g3),start);
+  $app.append(box); draw(); window.scrollTo({top:0});
 }
 
 /* ---------- quiz ---------- */
-function start(cfg,qs){ state={cfg,qs,i:0,right:0,answers:[]}; renderQ(); }
+function begin(cfg,qs){ state={cfg,qs,i:0,right:0,answers:[]}; renderQ(); }
 function renderQ(){
   const {cfg,qs,i}=state, q=qs[i]; $app.textContent="";
-  const back=el("button",{class:"back",type:"button","aria-label":"خروج من الكويز",onclick:()=>intro(cfg)},svgBack());
-  $app.append(el("div",{class:"top"},back,el("h1",{},cfg.final?"الامتحان الشامل":"كويز المحاضرة",el("small",{},cfg.sub))));
-  const card=el("div",{class:"card"});
-  const fill=el("div",{class:"fill"}); fill.style.width=(i/qs.length*100)+"%";
-  card.append(el("div",{class:"bar"},el("span",{},`سؤال ${ar(i+1)} من ${ar(qs.length)}`),el("div",{class:"track"},fill),el("span",{class:"score"},`✔ ${ar(state.right)}`)));
-  const badges=el("div",{class:"badges"});
-  if(cfg.final) badges.append(el("span",{class:"badge"},`محاضرة ${ar(q.lec)}`));
-  q.srcs.forEach(s=>badges.append(el("span",{class:"badge"+(s.startsWith("NCLEX")?" ncl":"")},s)));
-  if(q.hot) badges.append(el("span",{class:"badge hot"},"🔥 متكرر في الامتحانات"));
-  if(q.sug) badges.append(el("span",{class:"badge",title:"المصدر مكانش فيه إجابة رسمية"},"إجابة مقترحة"));
-  card.append(badges);
-  card.append(el("div",{class:"qtext"},el("span",{class:"qid"},q.id),q.q));
-  if(q.img){ const im=el("img",{class:"fig",src:IMGS[q.img]||(CDN+q.img),alt:"الصورة اللي في السؤال"}); im.onerror=()=>{ im.onerror=null; im.src=q.img; }; card.append(im); }
-  if(q.multi) card.append(el("p",{class:"hint"},"اختار كل الإجابات الصح، وبعدين دوس «تأكيد الإجابة»."));
-  const opts=el("div",{class:"opts",role:q.multi?"group":"radiogroup"}); const chosen=new Set(); let done=false;
-  const fbBox=el("div"); const nextBtn=el("button",{class:"primary",type:"button",hidden:true},i+1<qs.length?"السؤال اللي بعده":"شوف النتيجة");
-  const confirm=el("button",{class:"primary",type:"button",hidden:!q.multi,disabled:true},"تأكيد الإجابة");
-  const buttons=q.opts.map(([k,t])=>{ const b=el("button",{class:"opt",type:"button","data-k":k},el("span",{class:"k"},k),el("span",{},t));
+  $app.append(topBar(el("span",{class:"where"},`${ar(i+1)} من ${ar(qs.length)}`),el("button",{type:"button",onclick:()=>intro(cfg)},"خروج")));
+  const pr=el("div",{class:"prog"}); const fill=el("span"); fill.style.width=(i/qs.length*100)+"%"; pr.append(fill); $app.append(pr);
+  const from=el("p",{class:"from"});
+  const bits=[]; if(cfg.final) bits.push(`محاضرة ${ar(q.lec)}`); bits.push(...q.srcs);
+  from.append(bits.join("، "));
+  if(q.sug) from.append("، إجابة مقترحة");
+  if(q.hot){ from.append(el("br")); from.append(el("span",{class:"hot"},"سؤال متكرر في الامتحانات")); }
+  $app.append(from, el("p",{class:"q"},el("span",{class:"id"},q.id),q.q));
+  if(q.img){ const im=el("img",{class:"fig",src:IMGS[q.img]||(CDN+q.img),alt:"الصورة اللي في السؤال"}); im.onerror=()=>{ im.onerror=null; im.src=q.img; }; $app.append(im); }
+  const why=el("div"); const next=el("button",{class:"btn",type:"button",hidden:true},i+1<qs.length?"السؤال اللي بعده":"شوف النتيجة");
+  next.onclick=()=>{ state.i++; if(state.i<qs.length) renderQ(); else result(); };
+  let done=false;
+  const explain=(ok,extra)=>el("div",{class:"why"+(ok?"":" no"),role:"status"},el("p",{class:"v"},ok?"إجابة صح":"إجابة غلط"),extra,el("p",{class:"x"},q.ex));
+
+  if(q.complete){
+    $app.append(el("p",{class:"tip"},"فكّر في الإجابة الأول، وبعدين اكشفها وقول عرفتها ولا لأ."));
+    const blank=el("div",{class:"blank"},"……");
+    const reveal=el("button",{class:"btn line",type:"button"},"اكشف الإجابة");
+    const pair=el("div",{class:"pair",hidden:true});
+    reveal.onclick=()=>{ reveal.hidden=true; blank.textContent=q.ans_text; blank.classList.add("shown"); pair.hidden=false; };
+    const mark=ok=>{ if(done) return; done=true; pair.remove(); if(ok) state.right++; state.answers.push({q,picked:[],ok}); why.append(explain(ok,null)); next.hidden=false; next.focus({preventScroll:true}); why.scrollIntoView({behavior:"smooth",block:"nearest"}); };
+    pair.append(el("button",{class:"y",type:"button",onclick:()=>mark(true)},"عرفتها"),el("button",{class:"n",type:"button",onclick:()=>mark(false)},"معرفتهاش"));
+    $app.append(blank,reveal,pair,why,next); window.scrollTo({top:0});
+    document.onkeydown=e=>{ if(e.key==="Enter"&&done) next.click(); };
+    return;
+  }
+
+  if(q.multi) $app.append(el("p",{class:"tip"},"اختار كل الإجابات الصح، وبعدين دوس «تأكيد»."));
+  const opts=el("div",{class:"opts",role:q.multi?"group":"radiogroup"}); const chosen=new Set();
+  const confirm=el("button",{class:"btn",type:"button",hidden:!q.multi,disabled:true},"تأكيد");
+  const btns=q.opts.map(([k,t])=>{
+    const b=el("button",{class:"opt",type:"button","data-k":k},el("span",{class:"k"},k),el("span",{class:"t"},t));
     b.onclick=()=>{ if(done) return; if(q.multi){ chosen.has(k)?chosen.delete(k):chosen.add(k); b.classList.toggle("sel",chosen.has(k)); confirm.disabled=!chosen.size; } else { chosen.clear(); chosen.add(k); finish(); } };
     opts.append(b); return b; });
   function finish(){
     done=true; const correct=new Set(q.ans); const ok=chosen.size===correct.size&&[...chosen].every(k=>correct.has(k));
-    buttons.forEach(b=>{ const k=b.dataset.k; b.disabled=true; b.classList.remove("sel"); if(correct.has(k)) b.classList.add("right"); else if(chosen.has(k)) b.classList.add("wrong"); });
+    btns.forEach(b=>{ const k=b.dataset.k; b.disabled=true; b.classList.remove("sel");
+      if(correct.has(k)){ b.classList.add("right"); b.append(icon(true)); }
+      else if(chosen.has(k)){ b.classList.add("wrong"); b.append(icon(false)); }
+      else b.classList.add("dim"); });
     if(ok) state.right++;
     state.answers.push({q,picked:[...chosen],ok});
-    const fb=el("div",{class:"fb "+(ok?"ok":"bad"),role:"status"},
-      el("div",{class:"v"}, ok?"✔ إجابة صح":"✖ إجابة غلط"),
-      ok?null:el("div",{class:"ansline"},"الإجابة الصح: ",el("span",{},ansText(q))),
-      el("p",{},q.ex));
-    fbBox.append(fb); confirm.hidden=true; nextBtn.hidden=false; nextBtn.focus({preventScroll:true});
-    fb.scrollIntoView({behavior:"smooth",block:"nearest"});
+    why.append(explain(ok, ok?null:el("p",{class:"ans"},"الصح: ",el("span",{},ansText(q)))));
+    confirm.hidden=true; next.hidden=false; next.focus({preventScroll:true});
+    why.scrollIntoView({behavior:"smooth",block:"nearest"});
   }
   confirm.onclick=finish;
-  nextBtn.onclick=()=>{ state.i++; if(state.i<qs.length) renderQ(); else result(); };
-  if(q.complete){
-    const rv=el("div",{class:"reveal"},"فكّر في الإجابة في دماغك أو اكتبها في ورقة، وبعدين اكشفها.");
-    const show=el("button",{class:"primary",type:"button"},"اكشف الإجابة");
-    show.onclick=()=>{ show.hidden=true; rv.textContent=""; rv.append(el("div",{class:"ansbig"},q.ans_text),"كنت عارفها؟");
-      const y=el("button",{class:"y",type:"button"},"✔ عرفتها"), n=el("button",{class:"n",type:"button"},"✖ معرفتهاش");
-      const self=el("div",{class:"self"},y,n);
-      const pickSelf=ok=>{ done=true; self.remove(); if(ok) state.right++; state.answers.push({q,picked:[],ok});
-        const fb=el("div",{class:"fb "+(ok?"ok":"bad"),role:"status"},el("div",{class:"v"},ok?"✔ برافو":"✖ ولا يهمك، احفظها"),el("p",{},q.ex));
-        fbBox.append(fb); nextBtn.hidden=false; nextBtn.focus({preventScroll:true}); fb.scrollIntoView({behavior:"smooth",block:"nearest"}); };
-      y.onclick=()=>pickSelf(true); n.onclick=()=>pickSelf(false);
-      rv.after(self); };
-    card.append(rv,show,fbBox,nextBtn); $app.append(card); window.scrollTo({top:0});
-    document.onkeydown=e=>{ if(e.key==="Enter"&&done) nextBtn.click(); };
-    return;
-  }
-  nextBtn.onclick=()=>{ state.i++; if(state.i<qs.length) renderQ(); else result(); };
-  card.append(opts,fbBox,confirm,nextBtn); $app.append(card); window.scrollTo({top:0});
-  document.onkeydown=e=>{ if(!state||state.qs[state.i]!==q) return; const k=e.key.toLowerCase(); const idx="abcdef".indexOf(k)>-1?"abcdef".indexOf(k):"123456".indexOf(k); if(!done&&idx>-1&&buttons[idx]){ buttons[idx].click(); } else if(e.key==="Enter"&&done){ nextBtn.click(); } };
+  $app.append(opts,confirm,why,next); window.scrollTo({top:0});
+  document.onkeydown=e=>{ if(!state||state.qs[state.i]!==q) return; const k=e.key.toLowerCase(); let idx="abcdefgh".indexOf(k); if(idx<0) idx="12345678".indexOf(k); if(!done&&idx>-1&&btns[idx]) btns[idx].click(); else if(e.key==="Enter"&&done) next.click(); };
 }
 
 /* ---------- result ---------- */
 function result(){
   const {cfg,qs,right,answers}=state; const pct=Math.round(right/qs.length*100); $app.textContent=""; document.onkeydown=null;
-  const prev=store.get(cfg.key)||0; if(pct>prev) store.set(cfg.key,pct);
-  const msg= pct>=90?"ممتاز! إنت جاهز للامتحان 👏": pct>=75?"كويس جداً، راجع الغلطات بس": pct>=50?"مش وحش، بس محتاج تراجع المحاضرة تاني":"راجع الملخص الأول وبعدين جرب تاني";
-  const back=el("button",{class:"back",type:"button","aria-label":"رجوع",onclick:home},svgBack());
-  $app.append(el("div",{class:"top"},back,el("h1",{},"النتيجة",el("small",{},cfg.sub))));
-  const ring=el("div",{class:"ring"},el("div",{},el("span",{},el("b",{},ar(pct)+"٪"),el("br"),el("small",{},`${ar(right)} من ${ar(qs.length)}`)))); ring.style.setProperty("--p",pct);
-  const card=el("div",{class:"card res"},ring,el("h2",{},msg),el("p",{},pct>prev&&prev?`أحسن من محاولتك اللي فاتت (${ar(prev)}٪)`:prev&&pct<=prev?`أعلى درجة ليك هنا ${ar(prev)}٪`:""));
+  const prev=store.get(cfg.key); if(prev==null||pct>prev) store.set(cfg.key,pct);
+  const msg= pct>=90?"ممتاز، إنت جاهز للامتحان": pct>=75?"كويس جداً، راجع الغلطات بس": pct>=50?"محتاج تراجع المحاضرة تاني":"راجع الملخص الأول وبعدين جرّب تاني";
+  $app.append(topBar(el("span",{class:"where"},cfg.sub),el("button",{type:"button",onclick:home},"رجوع للمحاضرات")));
+  const res=el("div",{class:"res"});
+  const dots=el("div",{class:"dots","aria-hidden":"true"}); answers.forEach(a=>dots.append(el("i",{class:a.ok?"":"x"})));
+  res.append(el("p",{class:"big"},ar(right),el("small",{}," / "+ar(qs.length))),el("p",{class:"pct"},`${ar(pct)}٪`+(prev!=null?(pct>prev?`، أحسن من المرة اللي فاتت (${ar(prev)}٪)`:`، أعلى درجة ليك ${ar(Math.max(prev,pct))}٪`):"")),
+    el("p",{class:"msg"},msg),dots,el("p",{class:"legend"},"كل مربع سؤال بالترتيب: الأخضر صح والأحمر غلط"));
   const wrong=answers.filter(a=>!a.ok);
+  if(wrong.length) res.append(el("button",{class:"btn",type:"button",onclick:()=>begin(cfg,wrong.map(a=>a.q))},`عيد الـ ${ar(wrong.length)} اللي غلطت فيهم`));
+  res.append(el("button",{class:"btn line",type:"button",onclick:()=>begin(cfg,cfg.final?shuffle(qs):qs)},"عيد الكويز كله"));
+  $app.append(res);
   if(wrong.length){
-    card.append(el("button",{class:"primary",type:"button",onclick:()=>start(cfg,wrong.map(a=>a.q))},`عيد الـ ${ar(wrong.length)} اللي غلطت فيهم بس`));
+    const rv=el("div",{class:"review"},el("h2",{},"راجع اللي غلطت فيه"));
+    wrong.forEach(a=>rv.append(el("details",{},el("summary",{},`${a.q.id}  ${a.q.q}`),
+      el("div",{class:"body"},
+        a.q.complete?null:el("div",{},"إجابتك: ",el("span",{class:"en mine"},a.picked.map(k=>k+") "+optText(a.q,k)).join("   "))),
+        el("div",{},"الصح: ",el("span",{class:"en good"},ansText(a.q))),
+        el("p",{},a.q.ex)))));
+    $app.append(rv);
   }
-  card.append(el("button",{class:"ghost",type:"button",onclick:()=>start(cfg,cfg.final?shuffle(qs):qs)},"عيد الكويز كله"),el("button",{class:"ghost",type:"button",onclick:home},"رجوع للمحاضرات"));
-  if(wrong.length){
-    const wl=el("div",{class:"wl"},el("div",{class:"label"},"الأسئلة اللي غلطت فيها"));
-    wrong.forEach(a=>wl.append(el("details",{},el("summary",{},`${a.q.id}  ${a.q.q}`),el("div",{class:"a"},a.q.complete?null:"إجابتك: ",a.q.complete?null:el("span",{class:"yours"},a.picked.map(k=>k+") "+optText(a.q,k)).join(" · ")),a.q.complete?null:el("br"),"الصح: ",el("span",{class:"en"},ansText(a.q)),el("p",{},a.q.ex)))));
-    card.append(wl);
-  }
-  $app.append(card); window.scrollTo({top:0});
+  window.scrollTo({top:0});
 }
-const CDN="https://cdn.jsdelivr.net/gh/NURSINGDOSE/nursing-summaries@main/";
+
 async function boot(){
   if(!DATA){
-    const s=new URLSearchParams(location.search).get("s")||"";
-    if(!/^[a-z0-9-]+$/.test(s)){ $app.innerHTML='<p style="text-align:center;padding-top:40px">مفيش مادة بالاسم ده. <a href="./">ارجع للملخصات</a></p>'; return; }
-    const v="?v="+(new URLSearchParams(location.search).get("v")||"1");
+    const p=new URLSearchParams(location.search); const s=p.get("s")||"";
+    if(!/^[a-z0-9-]+$/.test(s)){ $app.innerHTML='<p class="loading">مفيش مادة بالاسم ده. <a href="./">ارجع للملخصات</a></p>'; return; }
+    const v="?v="+(p.get("v")||"2");
     for(const base of [CDN,""]){ try{ const r=await fetch(base+"quizzes/"+s+".json"+v); if(r.ok){ DATA=await r.json(); break; } }catch(e){} }
-    if(!DATA){ $app.innerHTML='<p style="text-align:center;padding-top:40px">مقدرناش نحمّل الأسئلة، جرب تاني بعد شوية. <a href="./">ارجع للملخصات</a></p>'; return; }
+    if(!DATA){ $app.innerHTML='<p class="loading">مقدرناش نحمّل الأسئلة، جرّب تاني بعد شوية. <a href="./">ارجع للملخصات</a></p>'; return; }
   }
   document.title="بنك أسئلة "+DATA.name+" | NURSING DOSE";
   home();
