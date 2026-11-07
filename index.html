@@ -89,6 +89,20 @@ section h2 small{font-family:var(--body);font-weight:400;font-size:.85rem;color:
 .zoom button:disabled{opacity:.35;cursor:default}
 .zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .zoom span{min-width:56px;text-align:center;font-weight:600;font-size:.9rem;font-variant-numeric:tabular-nums}
+.qb{margin-top:16px;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:14px}
+.qb h3{font-family:var(--display);font-size:1rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.qbtn{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--accent-ink,#fff);background:var(--accent);border-radius:12px;padding:12px 14px}
+.qbtn b{display:block;font-family:var(--display);font-size:1rem}
+.qbtn span{display:block;font-size:.82rem;opacity:.9}
+.qbtn i{font-style:normal;font-size:1.4rem;margin-inline-start:auto}
+.qfiles{display:grid;gap:6px;margin-top:10px}
+.qf{display:flex;align-items:center;gap:10px;width:100%;text-align:start;font:inherit;color:inherit;background:transparent;border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer}
+.qf:hover{border-color:var(--accent)}
+.qf.big{border-color:var(--accent);background:var(--tint)}
+.qf .ic{flex:none;font-size:1.1rem}
+.qf .ic.num{width:24px;height:24px;border-radius:7px;background:var(--tint);color:var(--accent);display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.qf .tt{flex:1;min-width:0;font-weight:600;font-size:.9rem;overflow-wrap:anywhere}
+.qf .sz{flex:none;font-size:.78rem;color:var(--muted)}
 @media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.head{padding-block:16px 10px}.btn .lbl{display:none}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 </style>
@@ -144,6 +158,21 @@ const total = DATA.reduce((a,s)=>a+s.items.length,0);
 const ready = DATA.filter(s=>s.items.length).length;
 $("summary").textContent = `${ar(total)} ملخص في ${ar(ready)} مواد · اختار المادة وافتح الملخص على طول`;
 
+const QB = {"peds-surg": {"quiz": "quiz.html?s=peds-surg", "count": 111, "files": [{"title": "مجمع أسئلة جراحة أطفال (منهج الميدترم)", "file": "qbank/peds-surg-0.pdf", "pages": 21, "size": 826868, "big": true}, {"title": "Pediatric Surgical Care", "n": 1, "file": "qbank/peds-surg-1.pdf", "pages": 4, "size": 461693}, {"title": "Common Pediatric Surgical Conditions (Hernia, Hydrocele & UDT)", "n": 2, "file": "qbank/peds-surg-2.pdf", "pages": 5, "size": 483104}, {"title": "CHPS & Tracheo-Oesophageal Fistula", "n": 3, "file": "qbank/peds-surg-3.pdf", "pages": 5, "size": 504972}, {"title": "Intussusception", "n": 4, "file": "qbank/peds-surg-4.pdf", "pages": 3, "size": 434349}, {"title": "Anorectal Malformations", "n": 5, "file": "qbank/peds-surg-5.pdf", "pages": 5, "size": 474660}, {"title": "توقعات الأسئلة المقالي", "file": "qbank/peds-surg-6.pdf", "pages": 4, "size": 329999}]}};
+function qbBlock(s){
+  const Q=QB[s.slug]; const box=document.createElement("div"); box.className="qb";
+  const h=document.createElement("h3"); h.textContent="📝 بنك الأسئلة"; box.append(h);
+  if(Q.quiz){ const a=document.createElement("a"); a.className="qbtn"; a.href=Q.quiz;
+    const t=document.createElement("div"); const b=document.createElement("b"); b.textContent="حل الأسئلة تفاعلي"; const sp=document.createElement("span"); sp.textContent=`كويز لكل محاضرة وامتحان شامل، ${ar(Q.count)} سؤال بالشرح`; t.append(b,sp);
+    const i=document.createElement("i"); i.textContent="←"; a.append(t,i); box.append(a); }
+  const fl=document.createElement("div"); fl.className="qfiles";
+  Q.files.forEach(it=>{ const r=document.createElement("button"); r.type="button"; r.className="qf"+(it.big?" big":"");
+    const ic=document.createElement("span"); ic.className="ic"; ic.textContent=it.big?"📚":it.n?ar(it.n):"✍️"; if(it.n) ic.className="ic num";
+    const tt=document.createElement("span"); tt.className="tt"; tt.textContent=it.title; if(it.n) tt.dir="ltr", tt.style.textAlign="right";
+    const sz=document.createElement("span"); sz.className="sz"; sz.textContent=pagesWord(it.pages);
+    r.append(ic,tt,sz); r.onclick=()=>openReader(it); fl.append(r); });
+  box.append(fl); return box;
+}
 let current = "all";
 function readHash(){ const h=location.hash.slice(1); return DATA.some(s=>s.slug===h)?h:"all"; }
 
@@ -196,6 +225,7 @@ function render(){
       });
       sec.append(g);
     }
+    if(!q&&QB[s.slug]) sec.append(qbBlock(s));
     list.append(sec);
   });
   if(!list.children.length){
