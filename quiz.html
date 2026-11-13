@@ -298,6 +298,9 @@ async function boot(){
   }
   document.title="بنك أسئلة "+DATA.name+" | NURSING DOSE";
   home();
+  const dl=new URLSearchParams(location.search).get("l");
+  if(dl==="final") intro({key:"final",title:"Final Exam",sub:"امتحان شامل من كل المحاضرات",pool:DATA.qs,final:true});
+  else if(dl){ const L=DATA.lecs.find(z=>String(z.n)===dl); if(L&&DATA.qs.some(q=>q.lec===L.n)) intro({key:"lec"+L.n,title:L.en,sub:L.ar,pool:DATA.qs.filter(q=>q.lec===L.n),final:false}); }
 }
 boot();
 </script></body></html>
