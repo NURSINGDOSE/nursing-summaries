@@ -215,7 +215,7 @@ function render(){
         shown++;
         const card=document.createElement("button"); card.className="card"; card.type="button";
         const th=document.createElement("div"); th.className="thumb";
-        const img=document.createElement("img"); img.src=CDN+it.thumb; img.onerror=()=>{img.onerror=null; img.src=it.thumb;}; img.alt=""; img.loading="lazy"; th.append(img);
+        const img=document.createElement("img"); img.src=it.thumb; img.onerror=()=>{img.onerror=null; img.src=CDN+it.thumb;}; img.alt=""; img.loading="lazy"; th.append(img);
         const m=document.createElement("div"); m.className="meta";
         const b=document.createElement("b"); b.textContent=it.title;
         const sp=document.createElement("span"); sp.textContent=`${it.pages?pagesWord(it.pages)+" · ":""}${mb(it.size)}`;
@@ -281,7 +281,7 @@ async function pump(){
 function release(h){ const c=h.querySelector("canvas"); if(c){ h.style.aspectRatio="1 / "+(h.dataset.ar||1.414); c.width=c.height=0; c.remove(); } h.dataset.w=""; }
 async function openReader(it){
   openItem=it; renderGen++; zoom=1;
-  $("rtitle").textContent=it.title; $("open").href=CDN+it.file; $("dl").href=CDN+it.file; $("dl").setAttribute("download",it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf");
+  $("rtitle").textContent=it.title; $("open").href=it.file; $("dl").href=it.file; $("dl").setAttribute("download",it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf");
   $("reader").hidden=false; document.body.style.overflow="hidden";
   if(!history.state||!history.state.reader){ try{ history.pushState({reader:true},""); }catch(e){} }
   const box=$("pages"); box.textContent=""; box.scrollTop=0; near.clear(); queue.length=0; applyZoom();
@@ -291,8 +291,8 @@ async function openReader(it){
   try{
     if(task) task.destroy(); curPdf=null;
     let pdf;
-    try{ task=openDoc(CDN+it.file); pdf=await task.promise; }
-    catch(err){ if(openItem!==it) return; task=openDoc(it.file); pdf=await task.promise; }
+    try{ task=openDoc(it.file); pdf=await task.promise; }
+    catch(err){ if(openItem!==it) return; task=openDoc(CDN+it.file); pdf=await task.promise; }
     if(openItem!==it) return;
     curPdf=pdf; st.remove();
     observer&&observer.disconnect();
@@ -318,7 +318,7 @@ $("zout").onclick=()=>{ const i=ZOOMS.indexOf(zoom); if(i>0){ zoom=ZOOMS[i-1]; a
 let pinchT; if(window.visualViewport) visualViewport.addEventListener("resize",()=>{ clearTimeout(pinchT); pinchT=setTimeout(()=>{ const s=visualViewport.scale||1; if(Math.abs(s-pinch)>0.15){ pinch=s; if(curPdf) refresh(); } },250); });
 let rszT; window.addEventListener("resize",()=>{ clearTimeout(rszT); rszT=setTimeout(()=>{ if(curPdf) refresh(); },300); });
 $("close").onclick=()=>closeReader(false);
-$("dl").addEventListener("click",async e=>{ const it=openItem; if(!it) return; e.preventDefault(); toast("بيتحمّل الملف…"); const name=it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf"; let blob; try{ blob=await (await fetch(CDN+it.file)).blob(); }catch(x){ try{ blob=await (await fetch(it.file)).blob(); }catch(y){} } if(!blob){ toast("التحميل وقف، جرّب «فتح»"); return; } const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); });
+$("dl").addEventListener("click",async e=>{ const it=openItem; if(!it) return; e.preventDefault(); toast("بيتحمّل الملف…"); const name=it.title.replace(/[\\/:*?"<>|]/g,"-")+".pdf"; let blob; try{ blob=await (await fetch(it.file)).blob(); }catch(x){ try{ blob=await (await fetch(CDN+it.file)).blob(); }catch(y){} } if(!blob){ toast("التحميل وقف، جرّب «فتح»"); return; } const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("reader").hidden) closeReader(); });
 
 
