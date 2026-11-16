@@ -293,7 +293,7 @@ async function boot(){
     const p=new URLSearchParams(location.search); const s=p.get("s")||"";
     if(!/^[a-z0-9-]+$/.test(s)){ $app.innerHTML='<p class="loading">مفيش مادة بالاسم ده. <a href="./">ارجع للملخصات</a></p>'; return; }
     const v="?v="+(p.get("v")||"2");
-    for(const base of [CDN,""]){ try{ const r=await fetch(base+"quizzes/"+s+".json"+v); if(r.ok){ DATA=await r.json(); break; } }catch(e){} }
+    for(const base of ["",CDN]){ try{ const r=await fetch(base+"quizzes/"+s+".json"+v); if(r.ok){ DATA=await r.json(); break; } }catch(e){} }
     if(!DATA){ $app.innerHTML='<p class="loading">مقدرناش نحمّل الأسئلة، جرّب تاني بعد شوية. <a href="./">ارجع للملخصات</a></p>'; return; }
   }
   document.title="بنك أسئلة "+DATA.name+" | NURSING DOSE";
