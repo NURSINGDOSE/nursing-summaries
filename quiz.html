@@ -139,6 +139,45 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,5vw,2rem);l
   .big{font-size:2.9rem}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* added: multi-lecture, navigator, controls, evidence, analysis */
+.mix{margin-top:28px}
+.mix h2{font-family:var(--display);font-size:1rem;font-weight:600;margin:0 0 4px}
+.mix .btn{margin-top:14px}
+.numrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.num{width:7.5rem;border:1px solid var(--line);border-radius:var(--r);padding:9px 12px;background:var(--sheet);color:var(--ink);font:inherit;font-variant-numeric:tabular-nums}
+.navtoggle{font-weight:600}
+.navwrap{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin:0 0 18px}
+.navgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(2.4rem,1fr));gap:6px;max-height:210px;overflow:auto;direction:rtl}
+.nb{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 0;cursor:pointer;font-variant-numeric:tabular-nums;font-size:.9rem}
+.nb.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.nb.no{background:var(--no-bg);border-color:var(--no);color:var(--no);font-weight:600}
+.nb.sk{border-style:dashed;color:var(--muted)}
+.nb.cur{outline:2px solid var(--accent);outline-offset:1px}
+.navwrap .legend{margin-top:8px}
+.ctrl{display:flex;gap:10px;margin-top:24px}
+.cb{flex:1;border:1px solid var(--line);background:var(--sheet);border-radius:var(--r);padding:13px 10px;font-family:var(--display);font-weight:600;cursor:pointer}
+.cb:disabled{opacity:.4;cursor:default}
+.cb.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1.6}
+.askend{margin-top:22px;text-align:center}
+.ev{margin-top:12px;background:var(--tint);border-radius:var(--r);padding:10px 14px}
+.ev .evh{margin:0 0 4px;font-family:var(--display);font-weight:600;font-size:.9rem;color:var(--accent)}
+.ev .evt{margin:0;font-size:.95rem;line-height:1.8}
+.ev .en{font-family:var(--en);direction:ltr;unicode-bidi:isolate}
+.ww{margin-top:10px}
+.ww p{margin:6px 0 0;line-height:1.9;color:var(--soft)}
+.ww p.mine b{color:var(--no)}
+.ww summary{cursor:pointer;color:var(--accent);font-weight:600;margin-top:8px}
+.dots i.s{background:var(--line)}
+.ana{margin-top:30px;text-align:start}
+.ana h2{font-family:var(--display);font-size:1.05rem;font-weight:600;margin:0 0 4px}
+.arow{display:grid;grid-template-columns:1fr 6rem 3rem;grid-template-areas:"l b p" "l t t";gap:2px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.al{grid-area:l}.abar{grid-area:b;height:8px;background:var(--line);border-radius:6px;overflow:hidden}.ap{grid-area:p;font-variant-numeric:tabular-nums;font-weight:600;text-align:left}
+.arow .tag{grid-area:t;font-size:.78rem;text-align:left}
+.al .lt{display:block;font-weight:500;line-height:1.5}.al .ls{display:block;font-size:.82rem;color:var(--muted)}
+.abar i{display:block;height:100%;border-radius:6px}
+.arow.good .abar i{background:var(--ok)}.arow.good .tag{color:var(--ok)}
+.arow.mid .abar i{background:var(--mark)}.arow.mid .tag{color:var(--muted)}
+.arow.bad .abar i{background:var(--no)}.arow.bad .tag{color:var(--no);font-weight:600}
 </style></head><body>
 <div class="wrap" id="app"><p class="loading">بيحمّل الأسئلة…</p></div>
 <script>
@@ -157,6 +196,7 @@ const icon = ok => { const s=document.createElementNS("http://www.w3.org/2000/sv
   s.innerHTML= ok ? '<path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' : '<path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>';
   s.style.color= ok ? "var(--ok)" : "var(--no)"; return s; };
 const topBar = (left,right) => el("div",{class:"top"},right,left);
+const lecOf = n => DATA.lecs.find(L=>L.n===n)||{n,en:"Lecture "+n,ar:""};
 let state=null;
 
 /* ---------- home ---------- */
@@ -167,122 +207,219 @@ function home(){
   const list=el("ul",{class:"list"});
   DATA.lecs.forEach(L=>{
     const n=DATA.qs.filter(q=>q.lec===L.n).length, best=store.get("lec"+L.n);
-    list.append(el("li",{},el("button",{class:"row",type:"button",disabled:L.ready===false||!n,onclick:()=>intro({key:"lec"+L.n,title:L.en,sub:L.ar,pool:DATA.qs.filter(q=>q.lec===L.n),final:false})},
+    list.append(el("li",{},el("button",{class:"row",type:"button",disabled:L.ready===false||!n,onclick:()=>intro(cfgFor([L.n]))},
       el("span",{class:"n"},ar(L.n)),
       el("span",{},el("span",{class:"en"},L.en),el("span",{class:"ar"},L.ar)),
       el("span",{class:"side"},`${ar(n)} سؤال`,best!=null?el("span",{class:"best"},`أعلى درجة ${ar(best)}٪`):null))));
   });
+  // multi-lecture picker
+  const picked=new Set();
+  const mixBox=el("div",{class:"mix"});
+  const chips=el("div",{class:"seg"});
+  const go=el("button",{class:"btn",type:"button",disabled:true},"اختار محاضرتين أو أكتر");
+  DATA.lecs.forEach(L=>{ const n=DATA.qs.filter(q=>q.lec===L.n).length; if(!n) return;
+    const b=el("button",{type:"button","aria-pressed":"false",title:L.en},`محاضرة ${ar(L.n)}`);
+    b.onclick=()=>{ picked.has(L.n)?picked.delete(L.n):picked.add(L.n); b.setAttribute("aria-pressed",String(picked.has(L.n)));
+      const tot=DATA.qs.filter(q=>picked.has(q.lec)).length;
+      go.disabled=picked.size<1; go.textContent=picked.size?`امتحن في ${ar(picked.size)} ${picked.size===1?"محاضرة":"محاضرات"} (${ar(tot)} سؤال)`:"اختار محاضرتين أو أكتر"; };
+    chips.append(b); });
+  go.onclick=()=>intro(cfgFor([...picked].sort((a,b)=>a-b)));
+  mixBox.append(el("h2",{},"امتحن نفسك في كذا محاضرة مع بعض"),el("p",{class:"tip"},"علّم على المحاضرات اللي عاوزها، والأسئلة هتتلخبط بينهم."),chips,go);
   const fbest=store.get("final");
-  $app.append(list,el("div",{class:"final"},el("button",{class:"row",type:"button",onclick:()=>intro({key:"final",title:"Final Exam",sub:"امتحان شامل من كل المحاضرات",pool:DATA.qs,final:true})},
+  $app.append(list,mixBox,el("div",{class:"final"},el("button",{class:"row",type:"button",onclick:()=>intro(cfgFor(null))},
     el("span",{class:"n"},"✦"),
     el("span",{},el("span",{class:"en"},"Final Exam"),el("span",{class:"ar"},"امتحان شامل، أسئلة متلخبطة من كل المحاضرات")),
     el("span",{class:"side"},`${ar(DATA.qs.length)} سؤال`,fbest!=null?el("span",{class:"best"},`أعلى درجة ${ar(fbest)}٪`):null))));
   window.scrollTo({top:0});
 }
+function cfgFor(lecs){
+  if(!lecs) return {key:"final",title:"Final Exam",sub:"امتحان شامل من كل المحاضرات",pool:DATA.qs,final:true,multi:true};
+  if(lecs.length===1){ const L=lecOf(lecs[0]); return {key:"lec"+L.n,title:L.en,sub:L.ar,pool:DATA.qs.filter(q=>q.lec===L.n),final:false,multi:false}; }
+  return {key:"mix"+lecs.join("-"),title:"Lectures "+lecs.join(" + "),sub:"محاضرات "+lecs.map(ar).join(" و"),pool:DATA.qs.filter(q=>lecs.includes(q.lec)),final:true,multi:true};
+}
 
 /* ---------- intro ---------- */
-function intro(cfg){
+function intro(cfg,preset){
   $app.textContent=""; document.onkeydown=null;
   const past=cfg.pool.filter(q=>q.kind==="past"), ncl=cfg.pool.filter(q=>q.kind==="nclex");
-  let filter="all", order=cfg.final?"shuffle":"order", size=cfg.final?Math.min(30,cfg.pool.length):0;
+  let filter="all", order=cfg.multi?"shuffle":"order";
   $app.append(topBar(el("span",{class:"where"},DATA.name),el("button",{type:"button",onclick:home},"رجوع للمحاضرات")));
   const box=el("div",{class:"intro"});
   box.append(el("h1",{},cfg.title),el("p",{class:"lead"},(DATA.kl?`${cfg.sub}. فيها ${ar(past.length)} سؤال ${DATA.kl.pastLong} و${ar(ncl.length)} ${DATA.kl.nclexLong}.`:`${cfg.sub}. فيها ${ar(past.length)} سؤال من الامتحانات و${ar(ncl.length)} على طريقة NCLEX.`)));
   const opt=(label,on,fn,count)=>el("button",{type:"button","aria-pressed":String(on),onclick:fn},label,count!=null?el("span",{class:"c"},ar(count)):null);
   const g1=el("div",{class:"seg"}),g2=el("div",{class:"seg"}),g3=el("div",{class:"seg"});
+  const num=el("input",{type:"number",id:"qcount",class:"num",min:"1",inputmode:"numeric","aria-label":"عدد الأسئلة"});
   const start=el("button",{class:"btn",type:"button"});
   const pick=()=>filter==="past"?past:filter==="nclex"?ncl:cfg.pool;
+  let size=preset&&preset.n?preset.n:(cfg.final?30:0);
+  function total(){ const n=pick().length; return (!size||size>=n)?n:size; }
+  function drawStart(){ const t=total(); start.textContent=`ابدأ (${ar(t)} سؤال)`; start.disabled=!pick().length; }
   function draw(){
     g1.textContent="";g2.textContent="";g3.textContent="";
     g1.append(opt("كل الأسئلة",filter==="all",()=>{filter="all";draw();},cfg.pool.length),opt((DATA.kl&&DATA.kl.past)||"امتحانات سابقة",filter==="past",()=>{filter="past";draw();},past.length),opt((DATA.kl&&DATA.kl.nclex)||"NCLEX",filter==="nclex",()=>{filter="nclex";draw();},ncl.length));
     g2.append(opt("بالترتيب",order==="order",()=>{order="order";draw();}),opt("عشوائي",order==="shuffle",()=>{order="shuffle";draw();}));
     const n=pick().length;
-    [10,20,30].filter(x=>x<n).forEach(x=>g3.append(opt(`${ar(x)} سؤال`,size===x,()=>{size=x;draw();})));
+    num.max=String(n); num.placeholder=`من ١ لـ ${ar(n)}`; num.value=String(total());
+    [10,20,30,50].filter(x=>x<n).forEach(x=>g3.append(opt(`${ar(x)}`,size===x,()=>{size=x;draw();})));
     g3.append(opt("الكل",!size||size>=n,()=>{size=0;draw();},n));
-    const total=(!size||size>=n)?n:size;
-    start.textContent=`ابدأ (${ar(total)} سؤال)`; start.disabled=!n;
+    drawStart();
   }
-  start.onclick=()=>{ let qs=pick(); if(order==="shuffle") qs=shuffle(qs); if(size&&size<qs.length) qs=qs.slice(0,size); begin(cfg,qs); };
-  box.append(el("div",{class:"field"},el("h2",{},"نوع الأسئلة"),g1),el("div",{class:"field"},el("h2",{},"الترتيب"),g2),el("div",{class:"field"},el("h2",{},"عدد الأسئلة"),g3),start);
+  num.oninput=()=>{ const n=pick().length; let v=parseInt(num.value,10); if(isNaN(v)||v<1){ start.disabled=true; return; } if(v>n) v=n; size=v>=n?0:v;
+    [...g3.children].forEach(b=>b.setAttribute("aria-pressed","false")); drawStart(); };
+  num.onblur=()=>{ num.value=String(total()); };
+  start.onclick=()=>{ let qs=pick(); if(order==="shuffle") qs=shuffle(qs); const t=total(); if(t<qs.length) qs=qs.slice(0,t); begin(cfg,qs); };
+  box.append(el("div",{class:"field"},el("h2",{},"نوع الأسئلة"),g1),el("div",{class:"field"},el("h2",{},"الترتيب"),g2),
+    el("div",{class:"field"},el("h2",{},el("label",{for:"qcount"},"عدد الأسئلة (اكتب أي رقم أو اختار)")),el("div",{class:"numrow"},num,g3)),start);
   $app.append(box); draw(); window.scrollTo({top:0});
 }
 
 /* ---------- quiz ---------- */
-function begin(cfg,qs){ state={cfg,qs,i:0,right:0,answers:[]}; renderQ(); }
+function begin(cfg,qs){ state={cfg,qs,i:0,ans:qs.map(()=>null),nav:false}; renderQ(); }
+function counts(){ const a=state.ans; return {right:a.filter(x=>x&&x.ok).length, wrong:a.filter(x=>x&&!x.ok&&!x.skip).length, skip:a.filter(x=>!x||x.skip).length, done:a.filter(x=>x&&!x.skip).length}; }
+function go(i){ if(i<0||i>=state.qs.length) return; state.i=i; renderQ(); }
+function navGrid(){
+  const g=el("div",{class:"navgrid",role:"group","aria-label":"أرقام الأسئلة"});
+  state.qs.forEach((q,j)=>{ const a=state.ans[j]; const cls=["nb"]; if(j===state.i) cls.push("cur"); if(a&&!a.skip) cls.push(a.ok?"ok":"no"); else if(a&&a.skip) cls.push("sk");
+    g.append(el("button",{class:cls.join(" "),type:"button",onclick:()=>{ state.nav=false; go(j); },"aria-label":`سؤال ${j+1}`},ar(j+1))); });
+  return g;
+}
+function evidence(q){
+  if(!q.ev) return null;
+  const evs=Array.isArray(q.ev)?q.ev:[q.ev];
+  return el("div",{class:"ev"},el("p",{class:"evh"},"الدليل من الملخص"),...evs.map(e=>typeof e==="string"?el("p",{class:"evt"},e):el("p",{class:"evt"},e.src?el("b",{},e.src+": "):null,el("span",{class:"en"},e.txt||""))));
+}
+function whyWrong(q,picked){
+  if(!q.why) return null;
+  const out=el("div",{class:"ww"});
+  const pickedWrong=(picked||[]).filter(k=>!q.ans.includes(k)&&q.why[k]);
+  pickedWrong.forEach(k=>out.append(el("p",{class:"mine"},el("b",{},`ليه (${k}) غلط؟ `),q.why[k])));
+  const others=q.opts.filter(([k])=>!q.ans.includes(k)&&!pickedWrong.includes(k)&&q.why[k]);
+  if(others.length){ out.append(el("details",{},el("summary",{},"ليه باقي الاختيارات غلط"),...others.map(([k])=>el("p",{},el("b",{},`(${k}) `),q.why[k])))); }
+  return out;
+}
+function explainBox(q,a){
+  const ok=a.ok;
+  return el("div",{class:"why"+(ok?"":" no"),role:"status"},el("p",{class:"v"},ok?"إجابة صح":"إجابة غلط"),
+    ok||q.complete?null:el("p",{class:"ans"},"الصح: ",el("span",{},ansText(q))),
+    el("p",{class:"x"},q.ex), whyWrong(q,a.picked), evidence(q));
+}
 function renderQ(){
-  const {cfg,qs,i}=state, q=qs[i]; $app.textContent="";
-  $app.append(topBar(el("span",{class:"where"},`${ar(i+1)} من ${ar(qs.length)}`),el("button",{type:"button",onclick:()=>intro(cfg)},"خروج")));
-  const pr=el("div",{class:"prog"}); const fill=el("span"); fill.style.width=(i/qs.length*100)+"%"; pr.append(fill); $app.append(pr);
+  const {cfg,qs,i}=state, q=qs[i]; const a=state.ans[i]; const answered=a&&!a.skip; $app.textContent="";
+  const c=counts();
+  $app.append(topBar(el("button",{type:"button",class:"navtoggle","aria-expanded":String(state.nav),onclick:()=>{ state.nav=!state.nav; renderQ(); }},`سؤال ${ar(i+1)} من ${ar(qs.length)} ▾`),el("button",{type:"button",onclick:()=>result()},"إنهاء وشوف النتيجة")));
+  const pr=el("div",{class:"prog"}); const fill=el("span"); fill.style.width=(c.done/qs.length*100)+"%"; pr.append(fill); $app.append(pr);
+  if(state.nav) $app.append(el("div",{class:"navwrap"},navGrid(),el("p",{class:"legend"},`✓ ${ar(c.right)} صح · ✗ ${ar(c.wrong)} غلط · ${ar(c.skip)} لسه/متخطي`)));
   const from=el("p",{class:"from"});
-  const bits=[]; if(cfg.final) bits.push(`محاضرة ${ar(q.lec)}`); bits.push(...q.srcs);
+  const bits=[]; if(cfg.multi) bits.push(`محاضرة ${ar(q.lec)}`); bits.push(...q.srcs); if(q.topic) bits.push(q.topic);
   from.append(bits.join("، "));
   if(q.sug) from.append("، إجابة مقترحة");
   if(q.hot){ from.append(el("br")); from.append(el("span",{class:"hot"},"سؤال متكرر في الامتحانات")); }
   $app.append(from, el("p",{class:"q"},el("span",{class:"id"},q.id),q.q));
   if(q.img){ const im=el("img",{class:"fig",src:IMGS[q.img]||(CDN+q.img),alt:"الصورة اللي في السؤال"}); im.onerror=()=>{ im.onerror=null; im.src=q.img; }; $app.append(im); }
-  const why=el("div"); const next=el("button",{class:"btn",type:"button",hidden:true},i+1<qs.length?"السؤال اللي بعده":"شوف النتيجة");
-  next.onclick=()=>{ state.i++; if(state.i<qs.length) renderQ(); else result(); };
-  let done=false;
-  const explain=(ok,extra)=>el("div",{class:"why"+(ok?"":" no"),role:"status"},el("p",{class:"v"},ok?"إجابة صح":"إجابة غلط"),extra,el("p",{class:"x"},q.ex));
+  const why=el("div");
+  const ctrl=el("div",{class:"ctrl"});
+  const prevB=el("button",{class:"cb",type:"button",disabled:i===0,onclick:()=>go(i-1)},"→ السابق");
+  const skipB=el("button",{class:"cb",type:"button",onclick:()=>{ if(!state.ans[i]) state.ans[i]={q,picked:[],ok:false,skip:true}; nextOrEnd(); }},"تخطي");
+  const nextB=el("button",{class:"cb main",type:"button",onclick:()=>nextOrEnd()},i+1<qs.length?"التالي ←":"شوف النتيجة");
+  function nextOrEnd(){ if(i+1<qs.length) go(i+1); else { const sk=state.ans.findIndex(x=>!x||x.skip); if(sk>-1&&sk!==i) askEnd(sk); else result(); } }
+  function refreshCtrl(){ ctrl.textContent=""; ctrl.append(prevB); const done=state.ans[i]&&!state.ans[i].skip; if(!done) ctrl.append(skipB); if(done) ctrl.append(nextB); }
+  function record(picked,ok){ state.ans[i]={q,picked,ok}; why.textContent=""; why.append(explainBox(q,state.ans[i])); refreshCtrl(); nextB.focus({preventScroll:true}); why.scrollIntoView({behavior:"smooth",block:"nearest"}); }
 
   if(q.complete){
     $app.append(el("p",{class:"tip"},"فكّر في الإجابة الأول، وبعدين اكشفها وقول عرفتها ولا لأ."));
     const blank=el("div",{class:"blank"},"……");
     const reveal=el("button",{class:"btn line",type:"button"},"اكشف الإجابة");
     const pair=el("div",{class:"pair",hidden:true});
-    reveal.onclick=()=>{ reveal.hidden=true; blank.textContent=q.ans_text; blank.classList.add("shown"); pair.hidden=false; };
-    const mark=ok=>{ if(done) return; done=true; pair.remove(); if(ok) state.right++; state.answers.push({q,picked:[],ok}); why.append(explain(ok,null)); next.hidden=false; next.focus({preventScroll:true}); why.scrollIntoView({behavior:"smooth",block:"nearest"}); };
-    pair.append(el("button",{class:"y",type:"button",onclick:()=>mark(true)},"عرفتها"),el("button",{class:"n",type:"button",onclick:()=>mark(false)},"معرفتهاش"));
-    $app.append(blank,reveal,pair,why,next); window.scrollTo({top:0});
-    document.onkeydown=e=>{ if(e.key==="Enter"&&done) next.click(); };
-    return;
+    const show=()=>{ reveal.hidden=true; blank.textContent=q.ans_text; blank.classList.add("shown"); };
+    reveal.onclick=()=>{ show(); pair.hidden=false; };
+    pair.append(el("button",{class:"y",type:"button",onclick:()=>{ pair.remove(); record([],true); }},"عرفتها"),el("button",{class:"n",type:"button",onclick:()=>{ pair.remove(); record([],false); }},"معرفتهاش"));
+    $app.append(blank,reveal,pair,why,ctrl);
+    if(answered){ show(); pair.remove(); why.append(explainBox(q,a)); }
+    refreshCtrl(); window.scrollTo({top:0}); keys(null); return;
   }
 
   if(q.multi) $app.append(el("p",{class:"tip"},"اختار كل الإجابات الصح، وبعدين دوس «تأكيد»."));
   const opts=el("div",{class:"opts",role:q.multi?"group":"radiogroup"}); const chosen=new Set();
-  const confirm=el("button",{class:"btn",type:"button",hidden:!q.multi,disabled:true},"تأكيد");
+  const confirm=el("button",{class:"btn",type:"button",hidden:!q.multi||answered,disabled:true},"تأكيد");
   const btns=q.opts.map(([k,t])=>{
     const b=el("button",{class:"opt",type:"button","data-k":k},el("span",{class:"k"},k),el("span",{class:"t"},t));
-    b.onclick=()=>{ if(done) return; if(q.multi){ chosen.has(k)?chosen.delete(k):chosen.add(k); b.classList.toggle("sel",chosen.has(k)); confirm.disabled=!chosen.size; } else { chosen.clear(); chosen.add(k); finish(); } };
+    b.onclick=()=>{ if(state.ans[i]&&!state.ans[i].skip) return; if(q.multi){ chosen.has(k)?chosen.delete(k):chosen.add(k); b.classList.toggle("sel",chosen.has(k)); confirm.disabled=!chosen.size; } else { chosen.clear(); chosen.add(k); finish(); } };
     opts.append(b); return b; });
-  function finish(){
-    done=true; const correct=new Set(q.ans); const ok=chosen.size===correct.size&&[...chosen].every(k=>correct.has(k));
+  function paint(pickedArr){
+    const correct=new Set(q.ans), picked=new Set(pickedArr);
     btns.forEach(b=>{ const k=b.dataset.k; b.disabled=true; b.classList.remove("sel");
       if(correct.has(k)){ b.classList.add("right"); b.append(icon(true)); }
-      else if(chosen.has(k)){ b.classList.add("wrong"); b.append(icon(false)); }
+      else if(picked.has(k)){ b.classList.add("wrong"); b.append(icon(false)); }
       else b.classList.add("dim"); });
-    if(ok) state.right++;
-    state.answers.push({q,picked:[...chosen],ok});
-    why.append(explain(ok, ok?null:el("p",{class:"ans"},"الصح: ",el("span",{},ansText(q)))));
-    confirm.hidden=true; next.hidden=false; next.focus({preventScroll:true});
-    why.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+  function finish(){
+    const correct=new Set(q.ans); const ok=chosen.size===correct.size&&[...chosen].every(k=>correct.has(k));
+    paint([...chosen]); confirm.hidden=true; record([...chosen],ok);
   }
   confirm.onclick=finish;
-  $app.append(opts,confirm,why,next); window.scrollTo({top:0});
-  document.onkeydown=e=>{ if(!state||state.qs[state.i]!==q) return; const k=e.key.toLowerCase(); let idx="abcdefgh".indexOf(k); if(idx<0) idx="12345678".indexOf(k); if(!done&&idx>-1&&btns[idx]) btns[idx].click(); else if(e.key==="Enter"&&done) next.click(); };
+  $app.append(opts,confirm,why,ctrl);
+  if(answered){ paint(a.picked); why.append(explainBox(q,a)); }
+  refreshCtrl(); window.scrollTo({top:0}); keys(btns);
+}
+function keys(btns){
+  const q=state.qs[state.i];
+  document.onkeydown=e=>{ if(!state||state.qs[state.i]!==q||e.target.tagName==="INPUT") return;
+    if(e.key==="ArrowRight"){ go(state.i-1); return; } if(e.key==="ArrowLeft"){ const a=state.ans[state.i]; if(a&&!a.skip&&state.i+1<state.qs.length) go(state.i+1); return; }
+    const a=state.ans[state.i]; const done=a&&!a.skip;
+    if(btns&&!done){ const k=e.key.toLowerCase(); let idx="abcdefgh".indexOf(k); if(idx<0) idx="12345678".indexOf(k); if(idx>-1&&btns[idx]) btns[idx].click(); }
+    if(e.key==="Enter"&&done){ const m=$app.querySelector(".cb.main"); if(m) m.click(); } };
+}
+function askEnd(sk){
+  const n=state.ans.filter(x=>!x||x.skip).length;
+  $app.querySelector(".ctrl").replaceWith(el("div",{class:"askend"},el("p",{},`فاضل ${ar(n)} سؤال متخطي أو لسه محلّيتوش.`),
+    el("button",{class:"btn",type:"button",onclick:()=>go(sk)},"ارجع حلّهم"),el("button",{class:"btn line",type:"button",onclick:()=>result()},"لأ، شوف النتيجة")));
+}
+
+/* ---------- analysis ---------- */
+function groupStats(keyFn,labelFn){
+  const m=new Map();
+  state.qs.forEach((q,j)=>{ const k=keyFn(q); if(k==null) return; const a=state.ans[j]; const g=m.get(k)||{k,label:labelFn(k),tot:0,right:0,wrong:0,skip:0}; g.tot++; if(a&&!a.skip){ a.ok?g.right++:g.wrong++; } else g.skip++; m.set(k,g); });
+  return [...m.values()].map(g=>({...g,pct:Math.round(g.right/g.tot*100)}));
+}
+function anaTable(title,rows,hint){
+  rows.sort((a,b)=>a.pct-b.pct||b.tot-a.tot);
+  const box=el("div",{class:"ana"},el("h2",{},title),hint?el("p",{class:"tip"},hint):null);
+  rows.forEach(g=>{ const lvl=g.pct>=80?"good":g.pct>=60?"mid":"bad";
+    box.append(el("div",{class:"arow "+lvl},el("div",{class:"al"},el("span",{class:"lt"},g.label),el("span",{class:"ls"},`${ar(g.right)} من ${ar(g.tot)}`+(g.skip?` · ${ar(g.skip)} متخطي`:""))),
+      el("div",{class:"abar"},el("i",{style:`width:${Math.max(g.pct,2)}%`})),el("span",{class:"ap"},`${ar(g.pct)}٪`),
+      el("span",{class:"tag"},lvl==="bad"?"راجعها":lvl==="mid"?"محتاجة مراجعة خفيفة":"تمام"))); });
+  return box;
 }
 
 /* ---------- result ---------- */
 function result(){
-  const {cfg,qs,right,answers}=state; const pct=Math.round(right/qs.length*100); $app.textContent=""; document.onkeydown=null;
-  const prev=store.get(cfg.key); if(prev==null||pct>prev) store.set(cfg.key,pct);
-  const msg= pct>=90?"ممتاز، إنت جاهز للامتحان": pct>=75?"كويس جداً، راجع الغلطات بس": pct>=50?"محتاج تراجع المحاضرة تاني":"راجع الملخص الأول وبعدين جرّب تاني";
+  const {cfg,qs}=state; const c=counts(); const pct=Math.round(c.right/qs.length*100); $app.textContent=""; document.onkeydown=null;
+  const prev=store.get(cfg.key); if(c.done&&(prev==null||pct>prev)) store.set(cfg.key,pct);
+  const msg= pct>=90?"ممتاز، إنت جاهز للامتحان": pct>=75?"كويس جداً، راجع الغلطات بس": pct>=50?"محتاج تراجع تاني":"راجع الملخص الأول وبعدين جرّب تاني";
   $app.append(topBar(el("span",{class:"where"},cfg.sub),el("button",{type:"button",onclick:home},"رجوع للمحاضرات")));
   const res=el("div",{class:"res"});
-  const dots=el("div",{class:"dots","aria-hidden":"true"}); answers.forEach(a=>dots.append(el("i",{class:a.ok?"":"x"})));
-  res.append(el("p",{class:"big"},ar(right),el("small",{}," / "+ar(qs.length))),el("p",{class:"pct"},`${ar(pct)}٪`+(prev!=null?(pct>prev?`، أحسن من المرة اللي فاتت (${ar(prev)}٪)`:`، أعلى درجة ليك ${ar(Math.max(prev,pct))}٪`):"")),
-    el("p",{class:"msg"},msg),dots,el("p",{class:"legend"},"كل مربع سؤال بالترتيب: الأخضر صح والأحمر غلط"));
-  const wrong=answers.filter(a=>!a.ok);
-  if(wrong.length) res.append(el("button",{class:"btn",type:"button",onclick:()=>begin(cfg,wrong.map(a=>a.q))},`عيد الـ ${ar(wrong.length)} اللي غلطت فيهم`));
-  res.append(el("button",{class:"btn line",type:"button",onclick:()=>begin(cfg,cfg.final?shuffle(qs):qs)},"عيد الكويز كله"));
+  const dots=el("div",{class:"dots","aria-hidden":"true"}); state.ans.forEach(a=>dots.append(el("i",{class:!a||a.skip?"s":a.ok?"":"x"})));
+  res.append(el("p",{class:"big"},ar(c.right),el("small",{}," / "+ar(qs.length))),el("p",{class:"pct"},`${ar(pct)}٪`+(prev!=null?(pct>prev?`، أحسن من المرة اللي فاتت (${ar(prev)}٪)`:`، أعلى درجة ليك ${ar(Math.max(prev,pct))}٪`):"")),
+    el("p",{class:"msg"},msg),dots,el("p",{class:"legend"},`الأخضر صح (${ar(c.right)}) · الأحمر غلط (${ar(c.wrong)}) · الرمادي متخطي (${ar(c.skip)})`));
+  const wrong=state.ans.map((a,j)=>({a,q:qs[j]})).filter(x=>x.a&&!x.a.ok&&!x.a.skip);
+  const skipped=state.ans.map((a,j)=>({a,q:qs[j]})).filter(x=>!x.a||x.a.skip);
+  if(wrong.length) res.append(el("button",{class:"btn",type:"button",onclick:()=>begin(cfg,wrong.map(x=>x.q))},`عيد الـ ${ar(wrong.length)} اللي غلطت فيهم`));
+  if(skipped.length) res.append(el("button",{class:"btn line",type:"button",onclick:()=>begin(cfg,skipped.map(x=>x.q))},`حل الـ ${ar(skipped.length)} اللي متخطيهم`));
+  res.append(el("button",{class:"btn line",type:"button",onclick:()=>begin(cfg,cfg.multi?shuffle(qs):qs)},"عيد الكويز كله"));
   $app.append(res);
+  // analysis
+  const lecRows=groupStats(q=>q.lec,n=>{ const L=lecOf(n); return `محاضرة ${ar(n)}: ${L.en}`; });
+  if(lecRows.length>1) $app.append(anaTable("تحليل: إنت واقع في أنهي محاضرة؟",lecRows,"مترتبة من الأضعف للأقوى. ابدأ مراجعة باللي عليها «راجعها»."));
+  const topRows=groupStats(q=>q.topic||null,t=>t);
+  if(topRows.length) $app.append(anaTable(lecRows.length>1?"تحليل الجزئيات":"تحليل: محتاج تراجع أنهي جزئية؟",topRows,"كل جزئية من المحاضرة ونسبتك فيها."));
+  else if(lecRows.length===1){ const kRows=groupStats(q=>q.kind,k=>k==="nclex"?((DATA.kl&&DATA.kl.nclex)||"أسئلة NCLEX"):((DATA.kl&&DATA.kl.past)||"أسئلة الامتحانات السابقة")); if(kRows.length>1) $app.append(anaTable("تحليل حسب نوع السؤال",kRows,null)); }
   if(wrong.length){
     const rv=el("div",{class:"review"},el("h2",{},"راجع اللي غلطت فيه"));
-    wrong.forEach(a=>rv.append(el("details",{},el("summary",{},`${a.q.id}  ${a.q.q}`),
+    wrong.forEach(({a,q})=>rv.append(el("details",{},el("summary",{},`${q.id}  ${q.q}`),
       el("div",{class:"body"},
-        a.q.complete?null:el("div",{},"إجابتك: ",el("span",{class:"en mine"},a.picked.map(k=>k+") "+optText(a.q,k)).join("   "))),
-        el("div",{},"الصح: ",el("span",{class:"en good"},ansText(a.q))),
-        el("p",{},a.q.ex)))));
+        q.complete?null:el("div",{},"إجابتك: ",el("span",{class:"en mine"},a.picked.map(k=>k+") "+optText(q,k)).join("   "))),
+        el("div",{},"الصح: ",el("span",{class:"en good"},ansText(q))),
+        el("p",{},q.ex), whyWrong(q,a.picked), evidence(q)))));
     $app.append(rv);
   }
   window.scrollTo({top:0});
@@ -298,9 +435,9 @@ async function boot(){
   }
   document.title="بنك أسئلة "+DATA.name+" | NURSING DOSE";
   home();
-  const dl=new URLSearchParams(location.search).get("l");
-  if(dl==="final") intro({key:"final",title:"Final Exam",sub:"امتحان شامل من كل المحاضرات",pool:DATA.qs,final:true});
-  else if(dl){ const L=DATA.lecs.find(z=>String(z.n)===dl); if(L&&DATA.qs.some(q=>q.lec===L.n)) intro({key:"lec"+L.n,title:L.en,sub:L.ar,pool:DATA.qs.filter(q=>q.lec===L.n),final:false}); }
+  const p=new URLSearchParams(location.search); const dl=p.get("l"); const n=parseInt(p.get("n"),10)||0;
+  if(dl==="final") intro(cfgFor(null),{n});
+  else if(dl){ const ls=dl.split(/[,+ ]/).map(x=>parseInt(x,10)).filter(x=>DATA.qs.some(q=>q.lec===x)); if(ls.length) intro(cfgFor(ls),{n}); }
 }
 boot();
 </script></body></html>
