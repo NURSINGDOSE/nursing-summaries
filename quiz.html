@@ -313,7 +313,7 @@ function renderQ(){
   const bits=[]; if(cfg.multi) bits.push(`محاضرة ${ar(q.lec)}`); bits.push(...q.srcs); if(q.topic) bits.push(q.topic);
   from.append(bits.join("، "));
   if(q.sug) from.append("، إجابة مقترحة");
-  if(q.hot){ from.append(el("br")); from.append(el("span",{class:"hot"},"سؤال متكرر في الامتحانات")); }
+  if(q.hot){ from.append(el("br")); from.append(el("span",{class:"hot"},q.rep>1?`اتكرر ${ar(q.rep)} ${q.rep<=10?"مرات":"مرة"} في الامتحانات`:"سؤال متكرر في الامتحانات")); }
   $app.append(from, el("p",{class:"q"},el("span",{class:"id"},q.id),q.q));
   if(q.img){ const im=el("img",{class:"fig",src:IMGS[q.img]||(CDN+q.img),alt:"الصورة اللي في السؤال"}); im.onerror=()=>{ im.onerror=null; im.src=q.img; }; $app.append(im); }
   const why=el("div");
